@@ -1,0 +1,16 @@
+
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
+
+# check if debug or release
+CONFIG(debug, debug|release) {
+  DEBUG_EXT = _d
+} else {
+  DEBUG_EXT =
+}
+
+win32-msvc* {
+  LIBS += /Users/doudou/workspaceQT/MyLibrary/$$QT_VERSION/QmlApplication$${DEBUG_EXT}.lib
+} else {
+  LIBS += -L/Users/doudou/workspaceQT/MyLibrary/$$QT_VERSION -lQmlApplication$${DEBUG_EXT}
+}
