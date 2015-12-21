@@ -1,12 +1,13 @@
 #ifndef EXCELSHEET_H
 #define EXCELSHEET_H
 
+#include "libqmlapplication_global.h"
 #include <QObject>
 #include <QAxObject>
 #include <QDebug>
 #include "excelrange.h"
 
-class ExcelSheet : public QObject
+class QMLAPPLICATIONSHARED_EXPORT ExcelSheet : public QObject
 {
     Q_OBJECT
 
@@ -15,6 +16,8 @@ public:
 
     int rowCount() const { return m_rowCount; }
     int columnCount() const { return m_columnCount; }
+
+    QString name() const;
 
     QVariant cellsValue(const int &row, const int &column);
 

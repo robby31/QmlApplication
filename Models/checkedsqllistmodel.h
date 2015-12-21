@@ -1,9 +1,10 @@
 #ifndef CHECKEDSQLLISTMODEL_H
 #define CHECKEDSQLLISTMODEL_H
 
-#include "Models/sqllistmodel.h"
+#include "libqmlapplication_global.h"
+#include "basesqllistmodel.h"
 
-class CheckedSqlListModel : public SqlListModel
+class QMLAPPLICATIONSHARED_EXPORT CheckedSqlListModel : public BaseSqlListModel
 {
     Q_OBJECT
 
@@ -31,8 +32,8 @@ signals:
     void parameterChanged();
     void allcheckedChanged();
 
-public slots:
-    void update_query();
+private slots:
+    void init_query();
 
 private:
     QString m_parameter;

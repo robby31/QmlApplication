@@ -1,7 +1,7 @@
 #include "checkedsqllistmodel.h"
 
 CheckedSqlListModel::CheckedSqlListModel(QObject *parent) :
-    SqlListModel(parent),
+    BaseSqlListModel(parent),
     m_parameter(),
     m_allChecked(true),
     m_filteredName()
@@ -9,24 +9,16 @@ CheckedSqlListModel::CheckedSqlListModel(QObject *parent) :
     addCustomRole("checked");
     addCustomRole("name");
 
-    connect(this, SIGNAL(tablenameChanged()), this, SLOT(update_query()));
-    connect(this, SIGNAL(parameterChanged()), this, SLOT(update_query()));
-    connect(this, SIGNAL(isFilteredChanged()), this, SLOT(update_query()));
+    connect(this, SIGNAL(tablenameChanged()), this, SLOT(init_query()));
+    connect(this, SIGNAL(parameterChanged()), this, SLOT(init_query()));
 }
 
-void CheckedSqlListModel::update_query()
+void CheckedSqlListModel::init_query()
 {
     if (!tablename().isEmpty() && !m_parameter.isEmpty())
-    {
-        if (!filterCmd().isEmpty())
-            setQuery(QString("SELECT DISTINCT %2 from %1 WHERE %2 LIKE '%%%3%%' ORDER BY %2").arg(tablename()).arg(m_parameter).arg(filterCmd()));
-        else
-            setQuery(QString("SELECT DISTINCT %2 from %1 ORDER BY %2").arg(tablename()).arg(m_parameter));
-    }
+        setQuery(QString("SELECT DISTINCT %2 from %1 ORDER BY %2").arg(tablename()).arg(m_parameter));
     else
-    {
         setQuery(QString());
-    }
 }
 
 QVariant CheckedSqlListModel::data(const QModelIndex &index, int role) const
@@ -35,7 +27,7 @@ QVariant CheckedSqlListModel::data(const QModelIndex &index, int role) const
 
     if (strRole == "checked")
     {
-        QString name = SqlListModel::data(index, Qt::UserRole).toString();
+        QString name = BaseSqlListModel::data(index, Qt::UserRole).toString();
 
         if (m_allChecked)
             return !m_filteredName.contains(name);
@@ -43,9 +35,9 @@ QVariant CheckedSqlListModel::data(const QModelIndex &index, int role) const
             return m_filteredName.contains(name);
     }
     else if (strRole == "name")
-        return SqlListModel::data(index, Qt::UserRole);
+        return BaseSqlListModel::data(index, Qt::UserRole);
     else
-        return SqlListModel::data(index, role);
+        return BaseSqlListModel::data(index, role);
 }
 
 bool CheckedSqlListModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -57,7 +49,7 @@ bool CheckedSqlListModel::setData(const QModelIndex &index, const QVariant &valu
 
     if (strRole == "checked")
     {
-        QString name = SqlListModel::data(index, Qt::UserRole).toString();
+        QString name = BaseSqlListModel::data(index, Qt::UserRole).toString();
 
         if (m_allChecked)
         {

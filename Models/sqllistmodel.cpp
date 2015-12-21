@@ -1,165 +1,87 @@
 #include "sqllistmodel.h"
 
 SqlListModel::SqlListModel(QObject *parent) :
-    AbstractListModel(parent),
-    mRecords(),
-    mSqlQuery(),
-    mRoles(),
-    m_tablename(),
-    m_filtercmd(),
-    m_customRoles()
+    BaseSqlListModel(parent),
+    m_columnsToFilter(0),
+    m_columnDataModel(0),
+    m_columnDataModels(),
+    m_columnToFilterSelected(0)
 {
+    m_columnsToFilter = new ListModel(new FilteringColumnItem, this);
 
+    connect(this, SIGNAL(queryChanged()), this, SLOT(updateColumnDataModel()));
 }
 
-int SqlListModel::rowCount(const QModelIndex &parent) const
+void SqlListModel::addColumnToFilter(const QString &name)
 {
-    Q_UNUSED(parent)
-    return mRecords.count();
+    FilteringColumnItem *item;
+    item = new FilteringColumnItem(name, m_columnsToFilter);
+    m_columnsToFilter->appendRow(item);
 }
 
-QVariant SqlListModel::data(const QModelIndex &index, int role) const
+void SqlListModel::columnDataItemChanged(QModelIndex start, QModelIndex end)
 {
-    if (index.row() >=0 && index.row() < mRecords.count())
+    Q_UNUSED(start)
+    Q_UNUSED(end)
+
+    CheckedSqlListModel *item = qobject_cast<CheckedSqlListModel*>(sender());
+    if (item)
     {
-        if (role - Qt::UserRole >= 0)
-            return mRecords.at(index.row()).value(role - Qt::UserRole);
+        bool columnFiltered = !item->checkedFilterCmd().isEmpty();
+        if (m_columnToFilterSelected)
+            m_columnToFilterSelected->setData(columnFiltered, FilteringColumnItem::UsedRole);
     }
-
-    return QVariant::Invalid;
 }
 
-QHash<int, QByteArray> SqlListModel::roleNames() const
+void SqlListModel::updateColumnDataModel()
 {
-    return mRoles;
+    foreach (const QString &columnName, m_columnDataModels.keys())
+        m_columnDataModels[columnName]->reload();
 }
 
-bool SqlListModel::add_role(const QByteArray &roleName)
+void SqlListModel::setColumnDataModel(const QString &columnName)
 {
-    if (!mRoles.values().contains(roleName))
+    if (m_columnDataModels.contains(columnName))
     {
-        mRoles.insert(Qt::UserRole+mRoles.size(), roleName);
-        return true;
+        m_columnDataModel = m_columnDataModels[columnName];
     }
     else
     {
-        qWarning() << "unable to add role" << roleName;
-        return false;
+        m_columnDataModels[columnName] = new CheckedSqlListModel(this);
+        m_columnDataModels[columnName]->setTablename(tablename());
+        m_columnDataModels[columnName]->setParameter(columnName);
+        connect(m_columnDataModels[columnName], SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(columnDataItemChanged(QModelIndex,QModelIndex)));
+        m_columnDataModel = m_columnDataModels[columnName];
     }
-}
 
-void SqlListModel::setQuery(const QString &query)
-{
-    beginResetModel();
-    mRoles.clear();
-    mRecords.clear();
-
-    if (!query.isEmpty())
+    m_columnToFilterSelected = 0;
+    for (int index=0;index<m_columnsToFilter->rowCount();++index)
     {
-        if (mSqlQuery.exec(query))
+        FilteringColumnItem *item = qobject_cast<FilteringColumnItem*>(m_columnsToFilter->at(index));
+        if (item)
         {
-            while (mSqlQuery.next()){
-
-                if (!mSqlQuery.at())
-                {
-                    for (int i=0; i<mSqlQuery.record().count();++i) {
-                        mRoles.insert(Qt::UserRole+i, mSqlQuery.record().fieldName(i).toUtf8());
-                    }
-                }
-
-                mRecords.append(mSqlQuery.record());
+            QString name = item->data(FilteringColumnItem::NameRole).toString();
+            if (name == columnName)
+            {
+                m_columnToFilterSelected = item;
+                break;
             }
         }
-        else
-        {
-            qWarning() << mSqlQuery.lastError().text();
-        }
     }
-    else
+
+    emit columnDataModelChanged();
+}
+
+void SqlListModel::updateFilter()
+{
+    QStringList filterCmd;
+
+    foreach (const QString &columnName, m_columnDataModels.keys())
     {
-        mSqlQuery.clear();
+        QString cmd = m_columnDataModels[columnName]->checkedFilterCmd();
+        if (!cmd.isEmpty())
+            filterCmd << cmd;
     }
 
-    // add custom roles
-    foreach (const QByteArray &role, m_customRoles)
-        add_role(role);
-
-    endResetModel();
-
-    emit queryChanged();
-    emit lastErrorChanged();
-}
-
-void SqlListModel::setTablename(const QString &name)
-{
-    m_tablename = name;
-    emit tablenameChanged();
-}
-
-QString SqlListModel::query()
-{
-    return mSqlQuery.lastQuery();
-}
-
-QString SqlListModel::tablename()
-{
-    return m_tablename;
-}
-
-QString SqlListModel::lastError()
-{
-    return mSqlQuery.lastError().text();
-}
-
-bool SqlListModel::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-    QVector<int> roles;
-    roles << role;
-
-    QString strRole = QVariant::fromValue(mRoles[role]).toString();
-    if (!m_tablename.isEmpty() && index.row() >= 0 && index.row() < mRecords.count())
-    {
-        QSqlRecord record = mRecords.at(index.row());
-
-        QSqlQuery query;
-        query.prepare(QString("UPDATE %2 SET %1=:value WHERE id=:id").arg(strRole).arg(m_tablename));
-        if (strcmp(value.typeName(), "QDateTime") == 0)
-            query.bindValue(":value", QVariant::fromValue(value.toDate()));
-        else
-            query.bindValue(":value", value);
-        query.bindValue(":id", record.value("id"));
-        if (query.exec())
-        {
-            setQuery(mSqlQuery.lastQuery());
-            return true;
-        }
-        else
-        {
-            qDebug() << query.lastError();
-        }
-    }
-
-    if (tablename().isEmpty())
-        qDebug() << "<SqlListModel>: unable to setData, tablename is empty.";
-
-    return false;
-}
-
-void SqlListModel::reload()
-{
-    beginResetModel();
-    setQuery(mSqlQuery.lastQuery());
-    endResetModel();
-}
-
-void SqlListModel::setFilter(const QString &cmd)
-{
-    m_filtercmd = cmd;
-    emit isFilteredChanged();
-}
-
-void SqlListModel::addCustomRole(const QByteArray &role)
-{
-    if (!m_customRoles.contains(role))
-        m_customRoles << role;
+    setFilter(filterCmd.join(" and "));
 }

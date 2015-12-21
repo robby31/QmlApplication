@@ -204,7 +204,7 @@ bool ListModel::removeRows(int row, int count, const QModelIndex &parent)
         return false;
     }
 
-    if(row < 0 || (row+count) >= rowCount()) return false;
+    if(row < 0 || (row+count) > rowCount()) return false;
     beginRemoveRows(QModelIndex(), row, row+count-1);
     for(int i=0; i<count; ++i) {
         ListItem *item = m_list.takeAt(row);

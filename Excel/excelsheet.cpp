@@ -62,3 +62,12 @@ ExcelRange *ExcelSheet::range(const QString &name)
 
     return 0;
 }
+
+QString ExcelSheet::name() const
+{
+    if (m_sheet)
+        return m_sheet->property("Name").toString();
+    else
+        return QString();
+
+}

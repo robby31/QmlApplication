@@ -1,13 +1,14 @@
 #ifndef EXCEL_H
 #define EXCEL_H
 
+#include "libqmlapplication_global.h"
 #include <QObject>
 #include <QDebug>
 #include <QUrl>
 #include <QAxObject>
 #include "excelsheet.h"
 
-class Excel : public QObject
+class QMLAPPLICATIONSHARED_EXPORT Excel : public QObject
 {
     Q_OBJECT
 

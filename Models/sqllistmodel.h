@@ -2,61 +2,44 @@
 #define SQLLISTMODEL_H
 
 #include "libqmlapplication_global.h"
-#include "abstractlistmodel.h"
-#include <QtSql>
-#include <QDir>
+#include "basesqllistmodel.h"
+#include "filteringcolumnitem.h"
+#include "checkedsqllistmodel.h"
 
-#include <QDebug>
-
-class QMLAPPLICATIONSHARED_EXPORT SqlListModel : public AbstractListModel
+class QMLAPPLICATIONSHARED_EXPORT SqlListModel : public BaseSqlListModel
 {
     Q_OBJECT
 
-    Q_PROPERTY (QString query READ query WRITE setQuery NOTIFY queryChanged)
-    Q_PROPERTY (QString tablename READ tablename WRITE setTablename NOTIFY tablenameChanged)
-    Q_PROPERTY (QString lastError READ lastError NOTIFY lastErrorChanged)
+    Q_PROPERTY(ListModel *columnsToFilter READ columnsToFilter NOTIFY columnsToFilterChanged)
+    Q_PROPERTY(CheckedSqlListModel *columnDataModel READ columnDataModel NOTIFY columnDataModelChanged)
 
 public:
     explicit SqlListModel(QObject *parent = 0);
 
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex & parent = QModelIndex()) const { Q_UNUSED(parent) return mRoles.size(); }
+    ListModel *columnsToFilter() const { return m_columnsToFilter; }
 
-    virtual QVariant data(const QModelIndex &index, int role) const;
-    virtual QHash<int, QByteArray> roleNames() const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-
-    virtual bool isFiltered() const { return !m_filtercmd.isEmpty(); }
-    QString filterCmd() const { return m_filtercmd; }
-
-    QString query();
-    QString tablename();
-    QString lastError();
-
-    void setQuery(const QString &query);
-    void setTablename(const QString &name);
-
-    void addCustomRole(const QByteArray &role);
-
-private:
-    bool add_role(const QByteArray &roleName);
+    CheckedSqlListModel *columnDataModel() const { return m_columnDataModel; }
+    Q_INVOKABLE void setColumnDataModel(const QString &columnName);
+    Q_INVOKABLE void addColumnToFilter(const QString &name);
 
 signals:
-    void queryChanged();
-    void tablenameChanged();
-    void lastErrorChanged();
+    void columnsToFilterChanged();
+    void columnDataModelChanged();
+    void columnToFilterSelectedChanged();
 
 public slots:
-    void reload();
-    void setFilter(const QString &cmd);
+    void updateFilter();
+
+private slots:
+    void columnDataItemChanged(QModelIndex start, QModelIndex end);
+    void updateColumnDataModel();
 
 private:
-    QList<QSqlRecord> mRecords;
-    QSqlQuery mSqlQuery;
-    QHash<int, QByteArray> mRoles;
-    QString m_tablename;
-    QString m_filtercmd;
-    QList<QByteArray> m_customRoles;
+    // configure filtering
+    ListModel *m_columnsToFilter;
+    CheckedSqlListModel *m_columnDataModel;
+    QHash<QString, CheckedSqlListModel*> m_columnDataModels;
+    FilteringColumnItem *m_columnToFilterSelected;
 };
 
 #endif // SQLLISTMODEL_H

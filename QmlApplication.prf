@@ -10,7 +10,7 @@ CONFIG(debug, debug|release) {
 }
 
 win32-msvc* {
-  LIBS += /Users/doudou/workspaceQT/MyLibrary/$$QT_VERSION/QmlApplication$${DEBUG_EXT}.lib
+  LIBS += C:/Users/TO26027/Documents/MyLibrary/$$QT_VERSION/QmlApplication$${DEBUG_EXT}.lib
 } else {
-  LIBS += -L/Users/doudou/workspaceQT/MyLibrary/$$QT_VERSION -lQmlApplication$${DEBUG_EXT}
+  LIBS += -LC:/Users/TO26027/Documents/MyLibrary/$$QT_VERSION -lQmlApplication$${DEBUG_EXT}
 }

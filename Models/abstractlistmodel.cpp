@@ -4,7 +4,12 @@ AbstractListModel::AbstractListModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
     connect(this, SIGNAL(modelReset()), this, SIGNAL(rowCountChanged()));
+    connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SIGNAL(rowCountChanged()));
+    connect(this, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SIGNAL(rowCountChanged()));
+
     connect(this, SIGNAL(modelReset()), this, SIGNAL(columnCountChanged()));
+    connect(this, SIGNAL(columnsInserted(QModelIndex,int,int)), this, SIGNAL(columnCountChanged()));
+    connect(this, SIGNAL(columnsRemoved(QModelIndex,int,int)), this, SIGNAL(columnCountChanged()));
 }
 
 QString AbstractListModel::role(int columnNumber) const
