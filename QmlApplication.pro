@@ -12,7 +12,11 @@ TARGET = QmlApplication
 
 TEMPLATE = lib
 
-DESTDIR = C:/Users/TO26027/Documents/MyLibrary/$$QT_VERSION
+!exists($$(MYLIBRARY)) {
+    error("variable MYLIBRARY not set.")
+}
+
+DESTDIR = $$(MYLIBRARY)/$$QT_VERSION
 
 DEFINES += QMLAPPLICATION_LIBRARY
 
@@ -62,8 +66,8 @@ HEADERS +=  libqmlapplication_global.h \
 
 
 # add Python library
-include ( $$PWD/../EPC2/PythonQt/build/common.prf )
-include ( $$PWD/../EPC2/PythonQt/build/PythonQt.prf )
+include ( $$PWD/../PythonQt/build/common.prf )
+include ( $$PWD/../PythonQt/build/PythonQt.prf )
 
 DISTFILES += \
     QmlApplication.prf

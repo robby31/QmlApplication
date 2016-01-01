@@ -166,11 +166,14 @@ void ListModel::insertRow(int row, ListItem *item)
 
 void ListModel::clear()
 {
-    beginRemoveRows(QModelIndex(), 0, m_list.size()-1);
-    qDeleteAll(m_list);
-    m_list.clear();
-    clearFilter();
-    endRemoveRows();
+    if (m_list.size() > 0)
+    {
+        beginRemoveRows(QModelIndex(), 0, m_list.size()-1);
+        qDeleteAll(m_list);
+        m_list.clear();
+        clearFilter();
+        endRemoveRows();
+    }
 }
 
 bool ListModel::removeRow(int row, const QModelIndex &parent)
