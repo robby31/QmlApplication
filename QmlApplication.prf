@@ -9,8 +9,12 @@ CONFIG(debug, debug|release) {
   DEBUG_EXT =
 }
 
+!exists($$(MYLIBRARY)) {
+    error("variable MYLIBRARY not set.")
+}
+
 win32-msvc* {
-  LIBS += /Users/doudou/workspaceQT/MyLibrary/$$QT_VERSION/QmlApplication$${DEBUG_EXT}.lib
+  LIBS += $$(MYLIBRARY)/$$QT_VERSION/QmlApplication$${DEBUG_EXT}.lib
 } else {
-  LIBS += -L/Users/doudou/workspaceQT/MyLibrary/$$QT_VERSION -lQmlApplication$${DEBUG_EXT}
+  LIBS += -L$$(MYLIBRARY)/$$QT_VERSION -lQmlApplication$${DEBUG_EXT}
 }
