@@ -141,6 +141,7 @@ void BaseSqlListModel::update_query()
 
     if (!filteredStringQuery.isEmpty())
     {
+        mSqlQuery.clear();
         if (mSqlQuery.exec(filteredStringQuery))
         {
             while (mSqlQuery.next()){
@@ -157,6 +158,7 @@ void BaseSqlListModel::update_query()
         }
         else
         {
+            qWarning() << "query failed" << filteredStringQuery;
             qWarning() << mSqlQuery.lastError().text();
         }
     }
