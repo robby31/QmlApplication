@@ -7,6 +7,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QThread>
+#include <QtWebView>
 
 #include "UIController/uiservices.h"
 #include "UIController/controller.h"
@@ -23,8 +24,8 @@ public:
     void addWorker(Controller *controller, Worker *worker);
     void addController(const QString &qmlName, Controller *controller);
 
-    void loadMainQml(const QUrl &qmlMain)                         { mainUrl = qmlMain;     emit loadMainQmlSignal(qmlMain); }
-    void setQmlContextProperty(const QString &name, QObject *obj) { qmlEngine.rootContext()->setContextProperty(name, obj); }
+    void loadMainQml(const QUrl &qmlMain);
+    void setQmlContextProperty(const QString &name, QObject *obj);
     void setMainWindowTitle(const QString &name);
 
 signals:
