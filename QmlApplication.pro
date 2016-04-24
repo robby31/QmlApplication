@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += qml quick widgets sql axcontainer
+QT       += qml quick widgets sql webview
 
 QT       -= gui
 
@@ -37,10 +37,8 @@ SOURCES +=  \
     Config/configfile.cpp \
     Models/checkedsqllistmodel.cpp \
     Models/filteringcolumnitem.cpp \
-    Models/basesqllistmodel.cpp \
-    Excel/excel.cpp \
-    Excel/excelrange.cpp \
-    Excel/excelsheet.cpp
+    Models/basesqllistmodel.cpp
+
 
 HEADERS +=  libqmlapplication_global.h \
             Models/listmodel.h \
@@ -59,10 +57,21 @@ HEADERS +=  libqmlapplication_global.h \
     Config/configfile.h \
     Models/checkedsqllistmodel.h \
     Models/filteringcolumnitem.h \
-    Models/basesqllistmodel.h \
-    Excel/excel.h \
-    Excel/excelrange.h \
-    Excel/excelsheet.h
+    Models/basesqllistmodel.h
+
+
+# add support for EXCEL
+win32 {
+    QT += axcontainer
+
+    SOURCES += Excel/excel.cpp \
+               Excel/excelrange.cpp \
+               Excel/excelsheet.cpp
+
+    HEADERS += Excel/excel.h \
+               Excel/excelrange.h \
+               Excel/excelsheet.h
+}
 
 
 # add Python library
