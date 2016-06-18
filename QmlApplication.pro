@@ -4,13 +4,12 @@
 #
 #-------------------------------------------------
 
-QT       += qml quick widgets sql
-
+TEMPLATE = lib
+TARGET = QmlApplication
+QT       += qml quick widgets sql webview
 QT       -= gui
 
-TARGET = QmlApplication
-
-TEMPLATE = lib
+TARGET = $$qtLibraryTarget($$TARGET)
 
 !exists($$(MYLIBRARY)) {
     error("variable MYLIBRARY not set.")
@@ -27,7 +26,6 @@ SOURCES +=  \
             UIController/controller.cpp \
             UIController/uiservices.cpp \
             Worker/worker.cpp \
-    #Python/pythonmodule.cpp \
     IO/csvdatatable.cpp \
     Models/checkeditem.cpp \
     Models/checkedlistmodel.cpp \
@@ -48,7 +46,6 @@ HEADERS +=  libqmlapplication_global.h \
             UIController/controller.h \
             UIController/uiservices.h \
             Worker/worker.h \
-    #Python/pythonmodule.h \
     IO/csvdatatable.h \
     Models/checkeditem.h \
     Models/checkedlistmodel.h \
@@ -74,7 +71,6 @@ win32 {
                Excel/excelrange.h \
                Excel/excelsheet.h
 }
-
 
 DISTFILES += \
     QmlApplication.prf
