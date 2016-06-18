@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += qml quick widgets sql webview
+QT       += qml quick widgets sql
 
 QT       -= gui
 
@@ -27,7 +27,7 @@ SOURCES +=  \
             UIController/controller.cpp \
             UIController/uiservices.cpp \
             Worker/worker.cpp \
-    Python/pythonmodule.cpp \
+    #Python/pythonmodule.cpp \
     IO/csvdatatable.cpp \
     Models/checkeditem.cpp \
     Models/checkedlistmodel.cpp \
@@ -37,7 +37,8 @@ SOURCES +=  \
     Config/configfile.cpp \
     Models/checkedsqllistmodel.cpp \
     Models/filteringcolumnitem.cpp \
-    Models/basesqllistmodel.cpp
+    Models/basesqllistmodel.cpp \
+    Models/tablemodel.cpp
 
 
 HEADERS +=  libqmlapplication_global.h \
@@ -47,7 +48,7 @@ HEADERS +=  libqmlapplication_global.h \
             UIController/controller.h \
             UIController/uiservices.h \
             Worker/worker.h \
-    Python/pythonmodule.h \
+    #Python/pythonmodule.h \
     IO/csvdatatable.h \
     Models/checkeditem.h \
     Models/checkedlistmodel.h \
@@ -57,7 +58,8 @@ HEADERS +=  libqmlapplication_global.h \
     Config/configfile.h \
     Models/checkedsqllistmodel.h \
     Models/filteringcolumnitem.h \
-    Models/basesqllistmodel.h
+    Models/basesqllistmodel.h \
+    Models/tablemodel.h
 
 
 # add support for EXCEL
@@ -73,10 +75,6 @@ win32 {
                Excel/excelsheet.h
 }
 
-
-# add Python library
-include ( $$PWD/../PythonQt/build/common.prf )
-include ( $$PWD/../PythonQt/build/PythonQt.prf )
 
 DISTFILES += \
     QmlApplication.prf
