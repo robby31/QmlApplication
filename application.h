@@ -7,7 +7,6 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QThread>
-#include <QtWebView>
 
 #include "UIController/uiservices.h"
 #include "UIController/controller.h"

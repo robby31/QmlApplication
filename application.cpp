@@ -7,8 +7,6 @@ Application::Application(int &argc, char **argv) :
     uiServices(this),
     mainUrl()
 {
-    QtWebEngine::initialize();
-
     setQmlContextProperty("_app", this);
     connect(this, SIGNAL(loadMainQmlSignal(QUrl)), &qmlEngine, SLOT(load(QUrl)));
     connect(&qmlEngine, SIGNAL(objectCreated(QObject*,QUrl)), this, SLOT(objectCreated(QObject*,QUrl)));
