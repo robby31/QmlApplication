@@ -33,6 +33,17 @@ bool Excel::open(QUrl pathname)
     return false;
 }
 
+bool Excel::saveAs(QUrl pathname)
+{
+    if (m_workbook)
+    {
+        m_workbook->querySubObject("SaveAs (const QString&)", pathname);
+        return true;
+    }
+
+    return false;
+}
+
 void Excel::close()
 {
     if (m_workbook)

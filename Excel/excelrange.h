@@ -4,6 +4,7 @@
 #include "libqmlapplication_global.h"
 #include <QObject>
 #include <QAxObject>
+#include <QDebug>
 
 class QMLAPPLICATIONSHARED_EXPORT ExcelRange : public QObject
 {
@@ -26,6 +27,7 @@ public slots:
 
 private:
     QAxObject *m_obj;
+    QVariant m_values;
     int m_rowCount;
     int m_columnCount;
 };

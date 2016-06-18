@@ -3,6 +3,7 @@
 ExcelSheet::ExcelSheet(QAxObject *axsheet, QObject *parent) :
     QObject(parent),
     m_sheet(axsheet),
+    m_values(),
     m_rowCount(0),
     m_columnCount(0)
 {
@@ -12,13 +13,12 @@ ExcelSheet::ExcelSheet(QAxObject *axsheet, QObject *parent) :
 
         if (usedrange)
         {
-            QAxObject* rows = usedrange->querySubObject("Rows");
-            if (rows)
-                m_rowCount = rows->dynamicCall("Count").toInt();
+            m_values = usedrange->property("Value");
 
-            QAxObject* columns = usedrange->querySubObject("Columns");
-            if (columns)
-                m_columnCount = columns->property("Count").toInt();
+            m_rowCount = m_values.toList().size();
+
+            if (m_rowCount > 0)
+                m_columnCount = m_values.toList().at(0).toList().size();
 
             delete usedrange;
         }
@@ -35,16 +35,29 @@ QAxObject *ExcelSheet::cells(const int &row, const int &column)
 
 QVariant ExcelSheet::cellsValue(const int &row, const int &column)
 {
-    QAxObject *data = cells(row, column);
-    if (data)
+    if (row >=0 && row < m_rowCount && column>=0 && column < m_columnCount)
     {
-        QVariant result = data->property("Value");
-        delete data;
-        return result;
+        return m_values.toList().at(row).toList().at(column);
     }
     else
     {
+        qWarning() << "invalid row or column" << row << m_rowCount << " / " << column << m_columnCount;
         return QVariant();
+    }
+}
+
+bool ExcelSheet::writeValue(const int &row, const int &column, const QVariant &value)
+{
+    QAxObject *data = cells(row, column);
+    if (data)
+    {
+        data->dynamicCall("SetValue(const QVariant&)", value);
+        delete data;
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 

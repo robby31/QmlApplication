@@ -17,6 +17,7 @@ public:
     virtual ~Excel();
 
     bool open(QUrl pathname);
+    bool saveAs(QUrl pathname);
     void close();
     ExcelSheet *getSheet(const QString &name);
     ExcelSheet *getSheet(const int &index);

@@ -3,24 +3,18 @@
 ExcelRange::ExcelRange(QAxObject *axobj, QObject *parent) :
     QObject(parent),
     m_obj(axobj),
+    m_values(),
     m_rowCount(0),
     m_columnCount(0)
 {
     if (m_obj)
     {
-        QAxObject* rows = m_obj->querySubObject("Rows");
-        if (rows)
-        {
-            m_rowCount = rows->dynamicCall("Count").toInt();
-            delete rows;
-        }
+        m_values = m_obj->property("Value");
 
-        QAxObject* columns = m_obj->querySubObject("Columns");
-        if (columns)
-        {
-            m_columnCount = columns->property("Count").toInt();
-            delete columns;
-        }
+        m_rowCount = m_values.toList().size();
+
+        if (m_rowCount > 0)
+            m_columnCount = m_values.toList().at(0).toList().size();
     }
 }
 
@@ -34,15 +28,13 @@ QAxObject *ExcelRange::cells(const int &row, const int &column)
 
 QVariant ExcelRange::cellsValue(const int &row, const int &column)
 {
-    QAxObject *data = cells(row, column);
-    if (data)
+    if (row >=0 && row < m_rowCount && column>=0 && column < m_columnCount)
     {
-        QVariant result = data->property("Value");
-        delete data;
-        return result;
+        return m_values.toList().at(row).toList().at(column);
     }
     else
     {
+        qWarning() << "invalid row or column" << row << m_rowCount << " / " << column << m_columnCount;
         return QVariant();
     }
 }

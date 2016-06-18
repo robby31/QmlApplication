@@ -20,6 +20,7 @@ public:
     QString name() const;
 
     QVariant cellsValue(const int &row, const int &column);
+    bool writeValue(const int &row, const int &column, const QVariant &value);
 
     ExcelRange *range(const QString &name);
 
@@ -32,6 +33,7 @@ public slots:
 
 private:
     QAxObject *m_sheet;
+    QVariant m_values;
     int m_rowCount;
     int m_columnCount;
 };
