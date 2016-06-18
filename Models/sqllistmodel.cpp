@@ -36,7 +36,12 @@ void SqlListModel::columnDataItemChanged(QModelIndex start, QModelIndex end)
 void SqlListModel::updateColumnDataModel()
 {
     foreach (const QString &columnName, m_columnDataModels.keys())
-        m_columnDataModels[columnName]->reload();
+    {
+        if (m_columnDataModels[columnName]->checkedFilterCmd().isEmpty())
+        {
+            m_columnDataModels[columnName]->setQueryData(query());
+        }
+    }
 }
 
 void SqlListModel::setColumnDataModel(const QString &columnName)
@@ -48,7 +53,7 @@ void SqlListModel::setColumnDataModel(const QString &columnName)
     else
     {
         m_columnDataModels[columnName] = new CheckedSqlListModel(this);
-        m_columnDataModels[columnName]->setTablename(tablename());
+        m_columnDataModels[columnName]->setQueryData(query());
         m_columnDataModels[columnName]->setParameter(columnName);
         connect(m_columnDataModels[columnName], SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(columnDataItemChanged(QModelIndex,QModelIndex)));
         m_columnDataModel = m_columnDataModels[columnName];

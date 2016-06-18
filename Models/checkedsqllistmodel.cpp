@@ -4,18 +4,23 @@ CheckedSqlListModel::CheckedSqlListModel(QObject *parent) :
     BaseSqlListModel(parent),
     m_parameter(),
     m_allChecked(true),
-    m_filteredName()
+    m_filteredName(),
+    m_textFilter(),
+    m_queryData()
 {
     addCustomRole("checked");
     addCustomRole("name");
 
     connect(this, SIGNAL(tablenameChanged()), this, SLOT(init_query()));
+    connect(this, SIGNAL(queryDataChanged()), this, SLOT(init_query()));
     connect(this, SIGNAL(parameterChanged()), this, SLOT(init_query()));
 }
 
 void CheckedSqlListModel::init_query()
 {
-    if (!tablename().isEmpty() && !m_parameter.isEmpty())
+    if (!m_queryData.isEmpty() && !m_parameter.isEmpty())
+        setQuery(QString("SELECT DISTINCT %2 from (%1) ORDER BY %2").arg(m_queryData).arg(m_parameter));
+    else if (!tablename().isEmpty() && !m_parameter.isEmpty())
         setQuery(QString("SELECT DISTINCT %2 from %1 ORDER BY %2").arg(tablename()).arg(m_parameter));
     else
         setQuery(QString());
@@ -38,6 +43,12 @@ QVariant CheckedSqlListModel::data(const QModelIndex &index, int role) const
         return BaseSqlListModel::data(index, Qt::UserRole);
     else
         return BaseSqlListModel::data(index, role);
+}
+
+void CheckedSqlListModel::setQueryData(const QString &query)
+{
+    m_queryData = query;
+    emit queryDataChanged();
 }
 
 bool CheckedSqlListModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -118,7 +129,12 @@ QString CheckedSqlListModel::checkedFilterCmd()
 
     QStringList filteredString;
     foreach (const QString &name, m_filteredName)
-        filteredString << QString("'%1'").arg(name);
+    {
+        if (!name.contains("'"))
+            filteredString << QString("'%1'").arg(name);
+        else
+            filteredString << QString("\"%1\"").arg(name);
+    }
 
     if (m_allChecked  && !filteredString.isEmpty())
     {
@@ -130,4 +146,15 @@ QString CheckedSqlListModel::checkedFilterCmd()
     }
 
     return QString();
+}
+
+void CheckedSqlListModel::setTextFilter(const QString &text)
+{
+    m_textFilter = text;
+    emit textFilterChanged();
+
+    if (text != "")
+        setFilter(QString("%1 LIKE '%%%2%%'").arg(m_parameter).arg(text));
+    else
+        setFilter("");
 }
