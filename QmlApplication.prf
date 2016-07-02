@@ -7,7 +7,7 @@ CONFIG(debug, debug|release) {
  mac {
    DEBUG_EXT = _debug
  } else {
-   DEBUG_EXT = _d
+   DEBUG_EXT = d
  }
 } else {
   DEBUG_EXT =
