@@ -39,7 +39,7 @@ bool ConfigFile::readConfig() {
 
         if (open(QFile::ReadOnly))
         {
-            QTextStream stream(this);
+            QTextStream stream;
             while (!stream.atEnd())
             {
                 QString line = stream.readLine().trimmed();

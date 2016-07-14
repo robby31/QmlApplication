@@ -20,6 +20,8 @@ class QMLAPPLICATIONSHARED_EXPORT Application : public QApplication
 public:
     explicit Application(int &argc, char **argv);
 
+    QThread *backendThread() { return &backend; }
+
     void addToBackend(QObject *obj);
     void addWorker(Controller *controller, Worker *worker);
     void addController(const QString &qmlName, Controller *controller);

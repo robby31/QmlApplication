@@ -2,7 +2,7 @@
 
 Application::Application(int &argc, char **argv) :
     QApplication(argc, argv),
-    backend(this),
+    backend(),
     qmlEngine(this),
     uiServices(this),
     mainUrl()
