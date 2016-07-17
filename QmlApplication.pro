@@ -56,7 +56,8 @@ HEADERS +=  libqmlapplication_global.h \
     Models/checkedsqllistmodel.h \
     Models/filteringcolumnitem.h \
     Models/basesqllistmodel.h \
-    Models/tablemodel.h
+    Models/tablemodel.h \
+    mysqldatabase.h
 
 
 # add support for EXCEL
