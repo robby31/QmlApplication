@@ -53,6 +53,7 @@ void SqlListModel::setColumnDataModel(const QString &columnName)
     else
     {
         m_columnDataModels[columnName] = new CheckedSqlListModel(this);
+        m_columnDataModels[columnName]->setConnectionName(connectionName());
         m_columnDataModels[columnName]->setQueryData(query());
         m_columnDataModels[columnName]->setParameter(columnName);
         connect(m_columnDataModels[columnName], SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(columnDataItemChanged(QModelIndex,QModelIndex)));

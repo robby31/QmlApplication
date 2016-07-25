@@ -2,6 +2,7 @@
 #define BASESQLLISTMODEL_H
 
 #include "libqmlapplication_global.h"
+#include "mysqldatabase.h"
 #include "abstractlistmodel.h"
 #include <QtSql>
 #include <QDir>
@@ -12,6 +13,7 @@ class QMLAPPLICATIONSHARED_EXPORT BaseSqlListModel : public AbstractListModel
 {
     Q_OBJECT
 
+    Q_PROPERTY (QString connectionName READ connectionName WRITE setConnectionName NOTIFY connectionNameChanged)
     Q_PROPERTY (QString query READ query WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY (QString tablename READ tablename WRITE setTablename NOTIFY tablenameChanged)
     Q_PROPERTY (QString lastError READ lastError NOTIFY lastErrorChanged)
@@ -29,9 +31,13 @@ public:
     virtual bool isFiltered() const { return !m_filtercmd.isEmpty(); }
     QString filterCmd() const { return m_filtercmd; }
 
+    QString connectionName();
     QString query();
     QString tablename();
     QString lastError();
+
+    // set connection name
+    void setConnectionName(const QString &name);
 
     // set the query
     void setQuery(const QString &query);
@@ -45,6 +51,7 @@ private:
     bool add_role(const QByteArray &roleName);
 
 signals:
+    void connectionNameChanged();
     void queryChanged();
     void tablenameChanged();
     void lastErrorChanged();
@@ -61,6 +68,7 @@ private slots:
 
 private:
     QList<QSqlRecord> mRecords;
+    QString mconnectionName;
     QString mStringQuery;
     QSqlQuery mSqlQuery;
     QHash<int, QByteArray> mRoles;

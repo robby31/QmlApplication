@@ -3,6 +3,7 @@
 BaseSqlListModel::BaseSqlListModel(QObject *parent) :
     AbstractListModel(parent),
     mRecords(),
+    mconnectionName(),
     mStringQuery(),
     mSqlQuery(),
     mRoles(),
@@ -86,7 +87,7 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
     {
         QSqlRecord record = mRecords.at(index.row());
 
-        QSqlQuery query;
+        QSqlQuery query(GET_DATABASE(mconnectionName));
         query.prepare(QString("UPDATE %2 SET %1=:value WHERE id=:id").arg(strRole).arg(m_tablename));
         if (strcmp(value.typeName(), "QDateTime") == 0)
             query.bindValue(":value", QVariant::fromValue(value.toDate()));
@@ -139,7 +140,7 @@ void BaseSqlListModel::update_query()
     mRoles.clear();
     mRecords.clear();
 
-    if (!filteredStringQuery.isEmpty())
+    if (mSqlQuery.driver()->isOpen() && !filteredStringQuery.isEmpty())
     {
         mSqlQuery.clear();
         if (mSqlQuery.exec(filteredStringQuery))
@@ -175,4 +176,18 @@ void BaseSqlListModel::update_query()
 
     emit queryChanged();
     emit lastErrorChanged();
+}
+
+QString BaseSqlListModel::connectionName()
+{
+    return mconnectionName;
+}
+
+void BaseSqlListModel::setConnectionName(const QString &name)
+{
+    mconnectionName = name;
+    emit connectionNameChanged();
+
+    mSqlQuery = QSqlQuery(GET_DATABASE(mconnectionName));
+    setQuery(mStringQuery);
 }
