@@ -1,24 +1,9 @@
-
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
-
-# check if debug or release
-CONFIG(debug, debug|release) {
- mac {
-   DEBUG_EXT = _debug
- } else {
-   DEBUG_EXT = d
- }
-} else {
-  DEBUG_EXT =
-}
 
 !exists($$(MYLIBRARY)) {
     error("variable MYLIBRARY not set.")
 }
 
-win32-msvc* {
-  LIBS += $$(MYLIBRARY)/$$QT_VERSION/QmlApplication$${DEBUG_EXT}.lib
-} else {
-  LIBS += -L$$(MYLIBRARY)/$$QT_VERSION -lQmlApplication$${DEBUG_EXT}
-}
+LIBS += -L$$(MYLIBRARY)/$$QT_VERSION -l$$qtLibraryTarget(QmlApplication)
+
