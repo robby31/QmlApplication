@@ -36,7 +36,8 @@ SOURCES +=  \
     Models/checkedsqllistmodel.cpp \
     Models/filteringcolumnitem.cpp \
     Models/basesqllistmodel.cpp \
-    Models/tablemodel.cpp
+    Models/tablemodel.cpp \
+    Worker/myrunnable.cpp
 
 
 HEADERS +=  libqmlapplication_global.h \
@@ -57,7 +58,8 @@ HEADERS +=  libqmlapplication_global.h \
     Models/filteringcolumnitem.h \
     Models/basesqllistmodel.h \
     Models/tablemodel.h \
-    mysqldatabase.h
+    mysqldatabase.h \
+    Worker/myrunnable.h
 
 
 # add support for EXCEL
