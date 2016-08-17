@@ -1,3 +1,5 @@
+QT += qml quick widgets sql webview
+
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
