@@ -1,4 +1,9 @@
-QT += qml quick widgets sql webview
+QT += qml quick widgets sql
+
+packagesExist(webview) {
+    QT += webview
+    DEFINES += WEBVIEW_PACKAGE
+}
 
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
