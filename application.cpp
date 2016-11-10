@@ -7,7 +7,9 @@ Application::Application(int &argc, char **argv) :
     uiServices(this),
     mainUrl()
 {
+    #ifdef WEBVIEW_PACKAGE
     QtWebView::initialize();
+    #endif
 
     setQmlContextProperty("_app", this);
     connect(this, SIGNAL(loadMainQmlSignal(QUrl)), &qmlEngine, SLOT(load(QUrl)));

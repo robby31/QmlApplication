@@ -6,8 +6,13 @@
 
 TEMPLATE = lib
 TARGET = QmlApplication
-QT       += qml quick widgets sql webview
+QT       += qml quick widgets sql
 QT       -= gui
+
+packagesExist(webview) {
+    QT += webview
+    DEFINES += WEBVIEW_PACKAGE
+}
 
 TARGET = $$qtLibraryTarget($$TARGET)
 
