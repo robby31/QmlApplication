@@ -7,7 +7,7 @@ Application::Application(int &argc, char **argv) :
     uiServices(this),
     mainUrl()
 {
-    #ifdef WEBVIEW_PACKAGE
+    #if defined(WEBVIEW_PACKAGE)
     QtWebEngine::initialize();
     #endif
 

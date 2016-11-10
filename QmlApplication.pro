@@ -9,6 +9,11 @@ TARGET = QmlApplication
 QT       += qml quick widgets sql
 QT       -= gui
 
+qtHaveModule(webview) {
+    QT += webview
+    DEFINES += WEBVIEW_PACKAGE
+}
+
 TARGET = $$qtLibraryTarget($$TARGET)
 
 !exists($$(MYLIBRARY)) {

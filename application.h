@@ -8,7 +8,7 @@
 #include <QQmlContext>
 #include <QThread>
 
-#ifdef WEBVIEW_PACKAGE
+#if defined(WEBVIEW_PACKAGE)
 #include <QtWebView>
 #endif
 

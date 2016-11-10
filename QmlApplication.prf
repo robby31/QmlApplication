@@ -1,11 +1,6 @@
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
-qtHaveModule(webengine) {
-    QT += webview
-    DEFINES += WEBVIEW_PACKAGE
-}
-
 !exists($$(MYLIBRARY)) {
     error("variable MYLIBRARY not set.")
 }
