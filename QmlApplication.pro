@@ -42,7 +42,8 @@ SOURCES +=  \
     Models/filteringcolumnitem.cpp \
     Models/basesqllistmodel.cpp \
     Models/tablemodel.cpp \
-    Worker/myrunnable.cpp
+    Worker/myrunnable.cpp \
+    Models/pivotmodel.cpp
 
 
 HEADERS +=  libqmlapplication_global.h \
@@ -64,7 +65,8 @@ HEADERS +=  libqmlapplication_global.h \
     Models/basesqllistmodel.h \
     Models/tablemodel.h \
     mysqldatabase.h \
-    Worker/myrunnable.h
+    Worker/myrunnable.h \
+    Models/pivotmodel.h
 
 
 # add support for EXCEL
