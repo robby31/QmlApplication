@@ -15,6 +15,25 @@ Excel::~Excel()
     close();
 }
 
+bool Excel::newWorkbook()
+{
+    QAxObject *workbooks = m_excel->querySubObject("Workbooks");
+
+    if (workbooks)
+    {
+        workbooks->dynamicCall("Add"); // Add new workbook
+        m_workbook = m_excel->querySubObject("ActiveWorkBook");
+        if (m_workbook)
+        {
+            m_sheets = m_workbook->querySubObject("Worksheets");
+            if (m_sheets)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 bool Excel::open(QUrl pathname)
 {
     QAxObject *workbooks = m_excel->querySubObject("Workbooks");
@@ -37,7 +56,7 @@ bool Excel::saveAs(QUrl pathname)
 {
     if (m_workbook)
     {
-        m_workbook->querySubObject("SaveAs (const QString&)", pathname);
+        m_workbook->querySubObject("SaveAs(QString&)", pathname);
         return true;
     }
 

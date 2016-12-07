@@ -16,6 +16,7 @@ public:
     explicit Excel(QObject *parent = 0);
     virtual ~Excel();
 
+    bool newWorkbook();
     bool open(QUrl pathname);
     bool saveAs(QUrl pathname);
     void close();
