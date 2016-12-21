@@ -1,11 +1,10 @@
 #ifndef APPCONTROLLER_H
 #define APPCONTROLLER_H
 
-#include "libqmlapplication_global.h"
 #include <QObject>
 #include <QTimer>
 
-class QMLAPPLICATIONSHARED_EXPORT UiServices : public QObject
+class UiServices : public QObject
 {
     Q_OBJECT
 

@@ -1,7 +1,6 @@
 #ifndef BASESQLLISTMODEL_H
 #define BASESQLLISTMODEL_H
 
-#include "libqmlapplication_global.h"
 #include "mysqldatabase.h"
 #include "abstractlistmodel.h"
 #include <QtSql>
@@ -9,7 +8,7 @@
 
 #include <QDebug>
 
-class QMLAPPLICATIONSHARED_EXPORT BaseSqlListModel : public AbstractListModel
+class BaseSqlListModel : public AbstractListModel
 {
     Q_OBJECT
 

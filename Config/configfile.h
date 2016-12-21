@@ -1,7 +1,6 @@
 #ifndef CONFIGFILE_H
 #define CONFIGFILE_H
 
-#include "libqmlapplication_global.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QDateTime>
@@ -11,7 +10,7 @@
 
 #include "Models/listmodel.h"
 
-class QMLAPPLICATIONSHARED_EXPORT ConfigFile : public QFile
+class ConfigFile : public QFile
 {
     Q_OBJECT
 

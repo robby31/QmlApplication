@@ -1,10 +1,9 @@
 #ifndef CHECKEDSQLLISTMODEL_H
 #define CHECKEDSQLLISTMODEL_H
 
-#include "libqmlapplication_global.h"
 #include "basesqllistmodel.h"
 
-class QMLAPPLICATIONSHARED_EXPORT CheckedSqlListModel : public BaseSqlListModel
+class CheckedSqlListModel : public BaseSqlListModel
 {
     Q_OBJECT
 

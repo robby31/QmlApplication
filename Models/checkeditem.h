@@ -1,11 +1,10 @@
 #ifndef CHECKEDITEM_H
 #define CHECKEDITEM_H
 
-#include "libqmlapplication_global.h"
 #include <QDebug>
 #include "Models/listmodel.h"
 
-class QMLAPPLICATIONSHARED_EXPORT CheckedItem : public ListItem
+class CheckedItem : public ListItem
 {
     Q_OBJECT
 

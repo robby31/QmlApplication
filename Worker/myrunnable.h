@@ -1,12 +1,10 @@
 #ifndef MYRUNNABLE_H
 #define MYRUNNABLE_H
 
-#include "libqmlapplication_global.h"
-
 #include <QObject>
 #include <QRunnable>
 
-class QMLAPPLICATIONSHARED_EXPORT MyRunnable : public QObject, public QRunnable
+class MyRunnable : public QObject, public QRunnable
 {
     Q_OBJECT
 

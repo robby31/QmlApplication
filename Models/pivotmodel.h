@@ -1,10 +1,9 @@
 #ifndef PIVOTMODEL_H
 #define PIVOTMODEL_H
 
-#include "libqmlapplication_global.h"
 #include "Models/sqllistmodel.h"
 
-class QMLAPPLICATIONSHARED_EXPORT PivotModel : public SqlListModel
+class PivotModel : public SqlListModel
 {
     Q_OBJECT
 

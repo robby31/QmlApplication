@@ -1,12 +1,11 @@
 #ifndef EXCELRANGE_H
 #define EXCELRANGE_H
 
-#include "libqmlapplication_global.h"
 #include <QObject>
 #include <QAxObject>
 #include <QDebug>
 
-class QMLAPPLICATIONSHARED_EXPORT ExcelRange : public QObject
+class ExcelRange : public QObject
 {
     Q_OBJECT
 

@@ -1,11 +1,10 @@
 #ifndef FILTERINGCOLUMNITEM_H
 #define FILTERINGCOLUMNITEM_H
 
-#include "libqmlapplication_global.h"
 #include "listmodel.h"
 #include <QDebug>
 
-class QMLAPPLICATIONSHARED_EXPORT FilteringColumnItem : public ListItem
+class FilteringColumnItem : public ListItem
 {
     Q_OBJECT
 

@@ -1,12 +1,11 @@
 #ifndef SQLLISTMODEL_H
 #define SQLLISTMODEL_H
 
-#include "libqmlapplication_global.h"
 #include "basesqllistmodel.h"
 #include "filteringcolumnitem.h"
 #include "checkedsqllistmodel.h"
 
-class QMLAPPLICATIONSHARED_EXPORT SqlListModel : public BaseSqlListModel
+class SqlListModel : public BaseSqlListModel
 {
     Q_OBJECT
 

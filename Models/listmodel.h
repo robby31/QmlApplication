@@ -1,12 +1,11 @@
 #ifndef LISTMODEL_H
 #define LISTMODEL_H
 
-#include "libqmlapplication_global.h"
 #include <QDebug>
 #include "abstractlistmodel.h"
 #include "listitem.h"
 
-class QMLAPPLICATIONSHARED_EXPORT ListModel : public AbstractListModel
+class ListModel : public AbstractListModel
 {
     Q_OBJECT
 

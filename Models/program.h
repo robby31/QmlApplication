@@ -4,7 +4,7 @@
 #include <QDebug>
 #include "Models/listmodel.h"
 
-class QMLAPPLICATIONSHARED_EXPORT Program : public ListItem
+class Program : public ListItem
 {
     Q_OBJECT
 

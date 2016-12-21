@@ -1,14 +1,13 @@
 #ifndef WORKER_H
 #define WORKER_H
 
-#include "libqmlapplication_global.h"
 #include <QObject>
 #include <QDebug>
 #include <QCoreApplication>
 #include <QMutex>
 #include <QWaitCondition>
 
-class QMLAPPLICATIONSHARED_EXPORT Worker : public QObject
+class Worker : public QObject
 {
     Q_OBJECT
 

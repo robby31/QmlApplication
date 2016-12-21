@@ -1,7 +1,6 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "libqmlapplication_global.h"
 #include <QApplication>
 #include <QtQml>
 #include <QQmlApplicationEngine>
@@ -16,7 +15,7 @@
 #include "UIController/controller.h"
 #include "Worker/worker.h"
 
-class QMLAPPLICATIONSHARED_EXPORT Application : public QApplication
+class Application : public QApplication
 {
     Q_OBJECT
 

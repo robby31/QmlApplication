@@ -1,10 +1,9 @@
 #ifndef ABSTRACTLISTMODEL_H
 #define ABSTRACTLISTMODEL_H
 
-#include "libqmlapplication_global.h"
 #include <QAbstractItemModel>
 
-class QMLAPPLICATIONSHARED_EXPORT AbstractListModel : public QAbstractItemModel
+class AbstractListModel : public QAbstractItemModel
 {
     Q_OBJECT
 

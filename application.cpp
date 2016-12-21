@@ -8,7 +8,7 @@ Application::Application(int &argc, char **argv) :
     mainUrl()
 {
     #if defined(WEBVIEW_PACKAGE)
-    QtWebEngine::initialize();
+    QtWebView::initialize();
     #endif
 
     setQmlContextProperty("_app", this);

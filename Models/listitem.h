@@ -1,11 +1,10 @@
 #ifndef LISTITEM_H
 #define LISTITEM_H
 
-#include "libqmlapplication_global.h"
 #include <QObject>
 #include <QVector>
 
-class QMLAPPLICATIONSHARED_EXPORT ListItem : public QObject
+class ListItem : public QObject
 {
     Q_OBJECT
 

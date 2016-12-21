@@ -1,11 +1,10 @@
 #ifndef CHECKEDLISTMODEL_H
 #define CHECKEDLISTMODEL_H
 
-#include "libqmlapplication_global.h"
 #include "listmodel.h"
 #include "checkeditem.h"
 
-class QMLAPPLICATIONSHARED_EXPORT CheckedListModel : public ListModel
+class CheckedListModel : public ListModel
 {
     Q_OBJECT
 

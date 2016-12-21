@@ -1,7 +1,6 @@
 #ifndef CSVDATATABLE_H
 #define CSVDATATABLE_H
 
-#include "libqmlapplication_global.h"
 #include <QObject>
 #include <QFile>
 #include <QRegularExpression>
@@ -9,7 +8,7 @@
 #include "Models/checkedlistmodel.h"
 #include "Models/checkeditem.h"
 
-class QMLAPPLICATIONSHARED_EXPORT CsvDataTable : public QObject
+class CsvDataTable : public QObject
 {
     Q_OBJECT
 

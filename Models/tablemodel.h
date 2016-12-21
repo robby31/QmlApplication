@@ -1,10 +1,9 @@
 #ifndef TABLEMODEL_H
 #define TABLEMODEL_H
 
-#include "libqmlapplication_global.h"
 #include "abstractlistmodel.h"
 
-class QMLAPPLICATIONSHARED_EXPORT TableModel : public AbstractListModel
+class TableModel : public AbstractListModel
 {
     Q_OBJECT
 

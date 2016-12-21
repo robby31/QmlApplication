@@ -20,9 +20,9 @@ TARGET = $$qtLibraryTarget($$TARGET)
     error("variable MYLIBRARY not set.")
 }
 
-DESTDIR = $$(MYLIBRARY)/$$QT_VERSION
+CONFIG += staticlib
 
-DEFINES += QMLAPPLICATION_LIBRARY
+DESTDIR = $$(MYLIBRARY)/$$QT_VERSION
 
 SOURCES +=  \
             Models/listmodel.cpp \
@@ -46,7 +46,7 @@ SOURCES +=  \
     Models/pivotmodel.cpp
 
 
-HEADERS +=  libqmlapplication_global.h \
+HEADERS +=  \
             Models/listmodel.h \
             Models/program.h \
             application.h \
