@@ -1,13 +1,12 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "libqmlapplication_global.h"
 #include <QObject>
 
 #include "uiservices.h"
 
 
-class QMLAPPLICATIONSHARED_EXPORT Controller : public QObject
+class Controller : public QObject
 {
     Q_OBJECT
 
