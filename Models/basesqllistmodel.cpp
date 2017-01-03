@@ -20,12 +20,40 @@ int BaseSqlListModel::rowCount(const QModelIndex &parent) const
     return mRecords.count();
 }
 
+QVariant BaseSqlListModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal)
+    {
+        if (role == Qt::DisplayRole)
+        {
+            if (section >= 0 && section < columnCount())
+                return mRoles[Qt::UserRole+section];
+            else
+                return QVariant::Invalid;
+        }
+    }
+
+    return AbstractListModel::headerData(section, orientation, role);
+}
+
 QVariant BaseSqlListModel::data(const QModelIndex &index, int role) const
 {
-    if (index.row() >=0 && index.row() < mRecords.count())
+    if (index.row() >= 0 && index.row() < mRecords.count())
     {
-        if (role - Qt::UserRole >= 0)
+        if (role == Qt::DisplayRole)
+        {
+            if (index.column() >= 0 && index.column() < columnCount())
+                return mRecords.at(index.row()).value(index.column());
+        }
+        else if (role == Qt::EditRole)
+        {
+            if (index.column() >= 0 && index.column() < columnCount())
+                return mRecords.at(index.row()).value(index.column());
+        }
+        else if (role - Qt::UserRole >= 0)
+        {
             return mRecords.at(index.row()).value(role - Qt::UserRole);
+        }
     }
 
     return QVariant::Invalid;
