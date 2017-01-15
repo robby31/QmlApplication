@@ -7,6 +7,10 @@
 #include <QQmlContext>
 #include <QThread>
 
+#if defined(WEBENGINE_PACKAGE)
+#include <QtWebView>
+#endif
+
 #if defined(WEBVIEW_PACKAGE)
 #include <QtWebView>
 #endif

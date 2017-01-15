@@ -11,7 +11,16 @@ QT       -= gui
 
 qtHaveModule(webview) {
     QT += webview
-    DEFINES += WEBVIEW_PACKAGE
+
+    contains( QT_MAJOR_VERSION, 5 ) {
+      greaterThan( QT_MINOR_VERSION, 6 ) {
+         DEFINES += WEBVIEW_PACKAGE
+      } else {
+         DEFINES += WEBENGINE_PACKAGE
+      }
+   } else {
+      DEFINES += WEBENGINE_PACKAGE
+   }
 }
 
 TARGET = $$qtLibraryTarget($$TARGET)
