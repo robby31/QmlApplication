@@ -20,7 +20,7 @@ public:
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const { Q_UNUSED(parent) return 1; }
     Q_INVOKABLE bool isEmpty() const {if (isFiltered()) return m_filteredIndex.isEmpty(); else return m_list.isEmpty();}
 
-    virtual ListItem *at(int row) const;
+    Q_INVOKABLE virtual ListItem *at(int row) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
