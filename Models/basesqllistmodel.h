@@ -5,7 +5,7 @@
 #include "abstractlistmodel.h"
 #include <QtSql>
 #include <QDir>
-
+#include <QElapsedTimer>
 #include <QDebug>
 
 class BaseSqlListModel : public AbstractListModel

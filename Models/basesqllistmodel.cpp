@@ -158,6 +158,9 @@ void BaseSqlListModel::addCustomRole(const QByteArray &role)
 
 void BaseSqlListModel::update_query()
 {
+    QElapsedTimer timer;
+    timer.start();
+
     QString filteredStringQuery;
     if (filterCmd().isEmpty())
         filteredStringQuery = mStringQuery;
@@ -204,6 +207,9 @@ void BaseSqlListModel::update_query()
 
     emit queryChanged();
     emit lastErrorChanged();
+
+    if (timer.elapsed() > 250)
+        qDebug() << "perfo query" << timer.elapsed() << mSqlQuery.lastQuery();
 }
 
 QString BaseSqlListModel::connectionName()
