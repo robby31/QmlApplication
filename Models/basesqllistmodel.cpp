@@ -225,3 +225,76 @@ void BaseSqlListModel::setConnectionName(const QString &name)
     mSqlQuery = QSqlQuery(GET_DATABASE(mconnectionName));
     setQuery(mStringQuery);
 }
+
+bool BaseSqlListModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    QSqlDatabase db = GET_DATABASE(mconnectionName);
+
+    if (m_tablename.isEmpty())
+    {
+        qCritical() << "tablename is not defined" << m_tablename;
+        return false;
+    }
+    else
+    {
+        if (db.transaction())
+        {
+            QSqlIndex primaryIndex = db.primaryIndex(m_tablename);
+            if (primaryIndex.count() == 0)
+            {
+                qCritical() << "unable to find primary index for table" << m_tablename;
+                db.rollback();
+                return false;
+            }
+            else
+            {
+                QString primaryKey = primaryIndex.fieldName(0);
+
+                QSqlQuery query(db);
+                if (query.exec(QString("SELECT %1 FROM (%2)").arg(primaryKey).arg(mSqlQuery.executedQuery())))
+                {
+                    if (query.seek(row))
+                    {
+                        if (!query.exec(QString("DELETE FROM %1 WHERE %2>=%3 and %2<=%4").arg(m_tablename).arg(primaryKey).arg(query.record().value("id").toInt()).arg(query.record().value("id").toInt()+count-1)))
+                        {
+                            qCritical() << query.lastError().text();
+                            db.rollback();
+                            return false;
+                        }
+                        else
+                        {
+                            beginRemoveRows(parent, row, row+count-1);
+                            endRemoveRows();
+                        }
+                    }
+                    else
+                    {
+                        qCritical() << "unable to seek QSqlQuery" << query.lastError().text();
+                        db.rollback();
+                        return false;
+                    }
+                }
+                else
+                {
+                    qCritical() << "unable to retrieve primary key values for removing data" << query.lastError().text();
+                    db.rollback();
+                    return false;
+                }
+
+            }
+
+
+            return db.commit();
+        }
+        else
+        {
+            qCritical() << db.lastError().text();
+            return false;
+        }
+    }
+}
+
+bool BaseSqlListModel::remove(int row)
+{
+    return removeRow(row);
+}

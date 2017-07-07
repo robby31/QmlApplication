@@ -28,6 +28,9 @@ public:
     virtual QHash<int, QByteArray> roleNames() const;
     virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
 
+    virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    Q_INVOKABLE bool remove(int row);
+
     virtual bool isFiltered() const { return !m_filtercmd.isEmpty(); }
     QString filterCmd() const { return m_filtercmd; }
 
