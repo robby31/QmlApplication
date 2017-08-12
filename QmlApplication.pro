@@ -29,6 +29,8 @@ TARGET = $$qtLibraryTarget($$TARGET)
     error("variable MYLIBRARY not set.")
 }
 
+CONFIG += c++11
+
 CONFIG += staticlib
 
 DESTDIR = $$(MYLIBRARY)/$$QT_VERSION
@@ -52,7 +54,8 @@ SOURCES +=  \
     Models/basesqllistmodel.cpp \
     Models/tablemodel.cpp \
     Worker/myrunnable.cpp \
-    Models/pivotmodel.cpp
+    Models/pivotmodel.cpp \
+    Worker/databaseworker.cpp
 
 
 HEADERS +=  \
@@ -75,7 +78,8 @@ HEADERS +=  \
     Models/tablemodel.h \
     mysqldatabase.h \
     Worker/myrunnable.h \
-    Models/pivotmodel.h
+    Models/pivotmodel.h \
+    Worker/databaseworker.h
 
 
 # add support for EXCEL

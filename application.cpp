@@ -27,6 +27,18 @@ Application::Application(int &argc, char **argv) :
     backend.setObjectName("Backend Application");
     connect(this, SIGNAL(aboutToQuit()), &backend, SLOT(quit()));
     backend.start();
+
+    connect(this, SIGNAL(databaseDriverNameChanged()), this, SLOT(createDatabase()));
+    connect(this, SIGNAL(databaseConnectionNameChanged()), this, SLOT(createDatabase()));
+
+    qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
+
+    // worker to initialize database in backend Thread
+    DatabaseWorker *worker = new DatabaseWorker();
+    addToBackend(worker);
+    connect(this, SIGNAL(createDatabaseSignal(QString,QString)), worker, SLOT(createDatabase(QString,QString)));
+    connect(this, SIGNAL(databaseOptionsSignal(QString)), worker, SLOT(databaseOptions(QString)));
+    connect(this, SIGNAL(databaseOpened(QUrl)), worker, SLOT(databaseOpened(QUrl)));
 }
 
 void Application::setMainWindowTitle(const QString &name)
@@ -83,4 +95,102 @@ void Application::loadMainQml(const QUrl &qmlMain)
 void Application::setQmlContextProperty(const QString &name, QObject *obj)
 {
     qmlEngine.rootContext()->setContextProperty(name, obj);
+}
+
+QString Application::databaseDriverName() const
+{
+    return m_databaseDriverName;
+}
+
+void Application::setdatabaseDiverName(const QString &driverName)
+{
+    if (!m_databaseDriverName.isEmpty())
+        qWarning() << "current database conncection will be lost.";
+
+    m_databaseDriverName = driverName;
+    emit databaseDriverNameChanged();
+}
+
+QString Application::databaseConnectionName() const
+{
+    return m_databaseConnectionName;
+}
+
+void Application::setdatabaseConnectionName(const QString &name)
+{
+    if (!m_databaseConnectionName.isEmpty())
+        qWarning() << "current database conncection will be lost.";
+
+    m_databaseConnectionName = name;
+    emit databaseConnectionNameChanged();
+}
+
+void Application::setdatabaseOptions(const QString &options)
+{
+    QSqlDatabase db = database();
+
+    if (db.isValid())
+    {
+        db.setConnectOptions(options);
+        emit databaseOptionsSignal(options);
+    }
+    else
+    {
+        qCritical() << this << "invalid database, unable to set options" << options;
+    }
+}
+
+QUrl Application::databasePathName() const
+{
+    return m_databasePathName;
+}
+
+void Application::setdatabasePathName(const QUrl path)
+{
+    QSqlDatabase db = GET_DATABASE(databaseConnectionName());
+
+    if (!db.isValid())
+    {
+        qCritical() << "invalid database" << databaseDriverName() << databaseConnectionName();
+    }
+    else
+    {
+        if (path.isLocalFile())
+        {
+
+            if (db.isOpen())
+                db.close();
+
+            db.setDatabaseName(path.toLocalFile());
+
+            if (!db.open())
+            {
+                qCritical() << "unable to open database" << db.lastError().text();
+            }
+            else
+            {
+                m_databasePathName = path;
+                emit databasePathNameChanged();
+                emit databaseOpened(path);
+            }
+        }
+        else
+        {
+            qCritical() << "invalid database pathname" << path;
+        }
+    }
+}
+
+void Application::createDatabase()
+{
+    if (!databaseDriverName().isEmpty() && !databaseConnectionName().isEmpty())
+    {
+        CREATE_DATABASE(databaseDriverName(), databaseConnectionName());
+        emit createDatabaseSignal(databaseDriverName(), databaseConnectionName());
+    }
+}
+
+QSqlDatabase Application::database() const
+{
+    return GET_DATABASE(databaseConnectionName());
 }
