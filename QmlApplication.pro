@@ -29,6 +29,8 @@ TARGET = $$qtLibraryTarget($$TARGET)
     error("variable MYLIBRARY not set.")
 }
 
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+
 CONFIG += c++11
 
 CONFIG += staticlib
