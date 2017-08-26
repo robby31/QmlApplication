@@ -127,6 +127,8 @@ void Application::setdatabaseConnectionName(const QString &name)
 
 void Application::setdatabaseOptions(const QString &options)
 {
+    qDebug() << QThread::currentThread() << "SET DATABASE OPTIONS" << options;
+
     QSqlDatabase db = database();
 
     if (db.isValid())
@@ -147,7 +149,10 @@ QUrl Application::databasePathName() const
 
 void Application::setdatabasePathName(const QUrl path)
 {
+    m_databasePathName.clear();
+
     QSqlDatabase db = GET_DATABASE(databaseConnectionName());
+    qDebug() << QThread::currentThread() << "OPEN DATABASE" << path;
 
     if (!db.isValid())
     {
@@ -170,15 +175,16 @@ void Application::setdatabasePathName(const QUrl path)
             else
             {
                 m_databasePathName = path;
-                emit databasePathNameChanged();
                 emit databaseOpened(path);
             }
         }
-        else
+        else if (!path.isEmpty())
         {
             qCritical() << "invalid database pathname" << path;
         }
     }
+
+    emit databasePathNameChanged();
 }
 
 void Application::createDatabase()
@@ -187,6 +193,7 @@ void Application::createDatabase()
     {
         CREATE_DATABASE(databaseDriverName(), databaseConnectionName());
         emit createDatabaseSignal(databaseDriverName(), databaseConnectionName());
+        qDebug() << QThread::currentThread() << "CREATE DATABASE" << databaseDriverName() << databaseConnectionName();
     }
 }
 

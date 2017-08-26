@@ -10,23 +10,23 @@ void DatabaseWorker::createDatabase(const QString &driverName, const QString &co
 {
     setdatabaseConnectionName(connectionName);
     CREATE_DATABASE(driverName, connectionName);
-    qDebug() << this << "CREATE DATABASE" << driverName << connectionName;
+    qDebug() << QThread::currentThread() << "CREATE DATABASE" << driverName << connectionName;
 }
 
 void DatabaseWorker::databaseOptions(const QString &options)
 {
-    qDebug() << this << "set database options" << options;
+    qDebug() << QThread::currentThread() << "set database options" << options;
     QSqlDatabase db = database();
 
     if (db.isValid())
         db.setConnectOptions(options);
     else
-        qCritical() << this << "invalid database, unable to set options" << options;
+        qCritical() << QThread::currentThread() << "invalid database, unable to set options" << options;
 }
 
 void DatabaseWorker::databaseOpened(const QUrl &path)
 {
-    qDebug() << this << "OPEN DATABASE" << path;
+    qDebug() << QThread::currentThread() << "OPEN DATABASE" << path;
 
     QSqlDatabase db = GET_DATABASE(databaseConnectionName());
 
