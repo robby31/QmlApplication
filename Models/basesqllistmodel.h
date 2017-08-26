@@ -20,6 +20,8 @@ class BaseSqlListModel : public AbstractListModel
 public:
     explicit BaseSqlListModel(QObject *parent = 0);
 
+    QVariant getPragma(const QString &param);
+
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex & parent = QModelIndex()) const { Q_UNUSED(parent) return mRoles.size(); }
 
@@ -53,6 +55,8 @@ public:
 private:
     bool add_role(const QByteArray &roleName);
 
+    bool readForeignKeys();
+
 signals:
     void connectionNameChanged();
     void queryChanged();
@@ -78,6 +82,7 @@ private:
     QString m_tablename;
     QString m_filtercmd;
     QList<QByteArray> m_customRoles;
+    QHash<QString, QHash<QString, QHash<QString, QString> > > m_foreignKeys;
 };
 
 #endif // BASESQLLISTMODEL_H

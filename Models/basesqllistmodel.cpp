@@ -129,12 +129,12 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
         }
         else
         {
-            qDebug() << query.lastError();
+            qCritical() << "setData" << index << value << role << query.lastQuery() << query.lastError();
         }
     }
 
-    if (tablename().isEmpty())
-        qDebug() << "<SqlListModel>: unable to setData, tablename is empty.";
+    if (m_tablename.isEmpty())
+        qCritical() << "<SqlListModel>: unable to setData, tablename is empty.";
 
     return false;
 }
@@ -222,6 +222,9 @@ void BaseSqlListModel::setConnectionName(const QString &name)
     mconnectionName = name;
     emit connectionNameChanged();
 
+    if (getPragma("foreign_keys").toBool())
+        readForeignKeys();
+
     mSqlQuery = QSqlQuery(GET_DATABASE(mconnectionName));
     setQuery(mStringQuery);
 }
@@ -297,4 +300,62 @@ bool BaseSqlListModel::removeRows(int row, int count, const QModelIndex &parent)
 bool BaseSqlListModel::remove(int row)
 {
     return removeRow(row);
+}
+
+QVariant BaseSqlListModel::getPragma(const QString &param)
+{
+    QSqlDatabase db = GET_DATABASE(mconnectionName);
+
+    if (db.isValid() && db.isOpen())
+    {
+        QSqlQuery query(db);
+        if (!query.exec(QString ("pragma %1;").arg(param)))
+        {
+            qCritical() << "unable to get PRAGMA" << param << ":" << query.lastError().text();
+            return QVariant();
+        }
+        else
+        {
+            if (query.next())
+                return query.value(0);
+            else
+                return QVariant();
+        }
+    }
+    else
+    {
+        qCritical() << QThread::currentThread() << "database is not valid or not open, unable to get pragma" << param;
+        return QVariant();
+    }
+}
+
+bool BaseSqlListModel::readForeignKeys()
+{
+    QSqlDatabase db = GET_DATABASE(mconnectionName);
+
+    if (db.isValid() && db.isOpen())
+    {
+        m_foreignKeys.clear();
+
+        QSqlQuery query(db);
+        foreach(QString tableName, db.tables())
+        {
+            query.exec(QString("pragma foreign_key_list(%1);").arg(tableName));
+            while (query.next())
+            {
+                QHash<QString, QString> tmp;
+                tmp["table"] = query.value("table").toString();
+                tmp["to"] = query.value("to").toString();
+                m_foreignKeys[tableName][query.value("from").toString()] = tmp;
+            }
+        }
+
+        qDebug() << "read foreign keys" << m_foreignKeys;
+        return true;
+    }
+    else
+    {
+        qCritical() << "database (name ="<< mconnectionName << ") is not valid or open, unable to read foreign keys.";
+        return false;
+    }
 }
