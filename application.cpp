@@ -201,3 +201,8 @@ QSqlDatabase Application::database() const
 {
     return GET_DATABASE(databaseConnectionName());
 }
+
+void Application::addImageProvider(const QString &id, QQmlImageProviderBase *provider)
+{
+    qmlEngine.addImageProvider(id, provider);
+}

@@ -37,6 +37,8 @@ public:
     void addWorker(Controller *controller, Worker *worker);
     void addController(const QString &qmlName, Controller *controller);
 
+    void addImageProvider(const QString &id, QQmlImageProviderBase *provider);
+
     void loadMainQml(const QUrl &qmlMain);
     void setQmlContextProperty(const QString &name, QObject *obj);
     void setMainWindowTitle(const QString &name);
