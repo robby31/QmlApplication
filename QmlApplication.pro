@@ -5,7 +5,10 @@
 #-------------------------------------------------
 
 TEMPLATE = lib
+
 TARGET = QmlApplication
+TARGET = $$qtLibraryTarget($$TARGET)
+
 QT       += qml quick widgets sql
 QT       -= gui
 
@@ -23,7 +26,6 @@ qtHaveModule(webview) {
    }
 }
 
-TARGET = $$qtLibraryTarget($$TARGET)
 
 !exists($$(MYLIBRARY)) {
     error("variable MYLIBRARY not set.")
@@ -34,8 +36,6 @@ CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 CONFIG += c++11
 
 CONFIG += staticlib
-
-DESTDIR = $$(MYLIBRARY)/$$QT_VERSION
 
 SOURCES +=  \
             Models/listmodel.cpp \
@@ -84,6 +84,12 @@ HEADERS +=  \
     Worker/databaseworker.h
 
 
+installPath = $$(MYLIBRARY)/$$QT_VERSION
+target.path = $$installPath
+INSTALLS += target
+
+installIncludePath = $$installPath/include/QmlApplication
+
 # add support for EXCEL
 win32 {
     QT += axcontainer
@@ -95,8 +101,32 @@ win32 {
     HEADERS += Excel/excel.h \
                Excel/excelrange.h \
                Excel/excelsheet.h
+
+   excel.files = Excel/*.h
+   excel.path = $$installIncludePath/Excel
+   INSTALLS += excel
 }
 
-DISTFILES += \
-    QmlApplication.prf
+app.files = application.h mysqldatabase.h
+app.path = $$installIncludePath
+INSTALLS += app
 
+config.files = Config/*.h
+config.path = $$installIncludePath/Config
+INSTALLS += config
+
+io.files = IO/*.h
+io.path = $$installIncludePath/IO
+INSTALLS += io
+
+models.files = Models/*.h
+models.path = $$installIncludePath/Models
+INSTALLS += models
+
+uicontroller.files = UIController/*.h
+uicontroller.path = $$installIncludePath/UIController
+INSTALLS += uicontroller
+
+worker.files = Worker/*.h
+worker.path = $$installIncludePath/Worker
+INSTALLS += worker
