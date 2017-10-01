@@ -107,7 +107,7 @@ win32 {
    INSTALLS += excel
 }
 
-app.files = application.h mysqldatabase.h
+app.files = *.h
 app.path = $$installIncludePath
 INSTALLS += app
 
