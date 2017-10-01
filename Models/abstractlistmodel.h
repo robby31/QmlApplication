@@ -2,6 +2,7 @@
 #define ABSTRACTLISTMODEL_H
 
 #include <QAbstractItemModel>
+#include <QDebug>
 
 class AbstractListModel : public QAbstractItemModel
 {
@@ -19,12 +20,14 @@ public:
     virtual QModelIndex parent(const QModelIndex &child) const { Q_UNUSED(child); return QModelIndex(); }
 
     Q_INVOKABLE QVariant dataByStringRole(const QModelIndex &index, QString role) const;
+
+    Q_INVOKABLE QVariantMap get(const int &index);
     Q_INVOKABLE QVariant get(int i, QString role) const;
 
     Q_INVOKABLE virtual QString role(int columnNumber) const;
     Q_INVOKABLE QString title(int columnNumber) const { return headerData(columnNumber, Qt::Horizontal).toString(); }
 
-    Q_INVOKABLE int findRow(const QVariant &value, const int &role) const;
+    Q_INVOKABLE int findRow(const QVariant &value, const QString &role) const;
 
     QModelIndex indexFromRow(const int row) const;
 

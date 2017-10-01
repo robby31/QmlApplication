@@ -20,6 +20,12 @@ int BaseSqlListModel::rowCount(const QModelIndex &parent) const
     return mRecords.count();
 }
 
+int BaseSqlListModel::columnCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent)
+    return mRoles.size();
+}
+
 QVariant BaseSqlListModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal)
@@ -113,23 +119,56 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
     QString strRole = QVariant::fromValue(mRoles[role]).toString();
     if (!m_tablename.isEmpty() && index.row() >= 0 && index.row() < mRecords.count())
     {
-        QSqlRecord record = mRecords.at(index.row());
+        QSqlDatabase db = GET_DATABASE(mconnectionName);
 
-        QSqlQuery query(GET_DATABASE(mconnectionName));
-        query.prepare(QString("UPDATE %2 SET %1=:value WHERE id=:id").arg(strRole).arg(m_tablename));
-        if (strcmp(value.typeName(), "QDateTime") == 0)
-            query.bindValue(":value", QVariant::fromValue(value.toDate()));
-        else
-            query.bindValue(":value", value);
-        query.bindValue(":id", record.value("id"));
-        if (query.exec())
+        QSqlIndex primaryIndex = db.primaryIndex(m_tablename);
+        if (primaryIndex.count() == 0)
         {
-            setQuery(mSqlQuery.lastQuery());
-            return true;
+            qCritical() << "setData unable to find primary index for table" << m_tablename;
         }
         else
         {
-            qCritical() << "setData" << index << value << role << query.lastQuery() << query.lastError();
+            QString primaryKey = primaryIndex.fieldName(0);
+
+            QSqlRecord record = mRecords.at(index.row());
+
+            QVariant primaryKeyData = record.value(primaryKey);
+            if (primaryKeyData.isValid())
+            {
+                QSqlQuery query(GET_DATABASE(mconnectionName));
+                query.prepare(QString("UPDATE %2 SET %1=:value WHERE %3=:id").arg(strRole).arg(m_tablename).arg(primaryKey));
+                if (strcmp(value.typeName(), "QDateTime") == 0)
+                    query.bindValue(":value", QVariant::fromValue(value.toDate()));
+                else
+                    query.bindValue(":value", value);
+                query.bindValue(":id", primaryKeyData);
+                if (query.exec())
+                {
+                    if (mSqlQuery.exec() && mSqlQuery.seek(index.row()))
+                    {
+                        if (mSqlQuery.record().value(primaryKey).isNull() or mSqlQuery.record().value(primaryKey).toInt() != mRecords[index.row()].value(primaryKey).toInt())
+                            qCritical() << "setData unable to update data" << primaryKey << mSqlQuery.record().value(primaryKey).toInt() << mRecords[index.row()].value(primaryKey).toInt();
+                        else
+                            mRecords[index.row()] = mSqlQuery.record();
+
+                        emit dataChanged(index, index, roles);
+
+                        return true;
+                    }
+                    else
+                    {
+                        qCritical() << "setData unable to update data" << mSqlQuery.lastError().text();
+                    }
+                }
+                else
+                {
+                    qCritical() << "setData" << index << value << role << query.lastQuery() << query.lastError();
+                }
+            }
+            else
+            {
+                qCritical() << "setData invalid primary key value" << primaryKey << record;
+            }
         }
     }
 
@@ -253,12 +292,16 @@ bool BaseSqlListModel::removeRows(int row, int count, const QModelIndex &parent)
             {
                 QString primaryKey = primaryIndex.fieldName(0);
 
-                QSqlQuery query(db);
-                if (query.exec(QString("SELECT %1 FROM (%2)").arg(primaryKey).arg(mSqlQuery.executedQuery())))
+                for (int i=0;i<count;++i)
                 {
-                    if (query.seek(row))
+                    QSqlRecord record = mRecords.at(row);
+                    QVariant primaryKeyData = record.value(primaryKey);
+                    if (primaryKeyData.isValid())
                     {
-                        if (!query.exec(QString("DELETE FROM %1 WHERE %2>=%3 and %2<=%4").arg(m_tablename).arg(primaryKey).arg(query.record().value("id").toInt()).arg(query.record().value("id").toInt()+count-1)))
+                        QSqlQuery query(db);
+                        query.prepare(QString("DELETE FROM %1 WHERE %2=:id").arg(m_tablename).arg(primaryKey));
+                        query.bindValue(":id", primaryKeyData);
+                        if (!query.exec())
                         {
                             qCritical() << query.lastError().text();
                             db.rollback();
@@ -267,25 +310,18 @@ bool BaseSqlListModel::removeRows(int row, int count, const QModelIndex &parent)
                         else
                         {
                             beginRemoveRows(parent, row, row+count-1);
+                            mRecords.removeAt(row);
                             endRemoveRows();
                         }
                     }
                     else
                     {
-                        qCritical() << "unable to seek QSqlQuery" << query.lastError().text();
+                        qCritical() << "invalid primarykey value" << primaryKey << primaryKeyData;
                         db.rollback();
                         return false;
                     }
                 }
-                else
-                {
-                    qCritical() << "unable to retrieve primary key values for removing data" << query.lastError().text();
-                    db.rollback();
-                    return false;
-                }
-
             }
-
 
             return db.commit();
         }
@@ -357,5 +393,31 @@ bool BaseSqlListModel::readForeignKeys()
     {
         qCritical() << "database (name ="<< mconnectionName << ") is not valid or open, unable to read foreign keys.";
         return false;
+    }
+}
+
+int BaseSqlListModel::append(const QVariantMap &data)
+{
+    QStringList keys = data.keys();
+    QStringList params;
+    foreach (QString param, keys)
+        params << QString(":%1").arg(param);
+
+    QSqlQuery query(GET_DATABASE(connectionName()));
+
+    QString cmd = QString("INSERT INTO %3 (%1) VALUES(%2)").arg(keys.join(",")).arg(params.join(",")).arg(tablename());
+    query.prepare(cmd);
+
+    foreach (QString param, keys)
+        query.bindValue(QString(":%1").arg(param), data[param]);
+
+    if (!query.exec())
+    {
+        qCritical() << "invalid query" << query.lastError().text();
+        return -1;
+    }
+    else
+    {
+        return query.lastInsertId().toInt();
     }
 }

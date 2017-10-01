@@ -24,7 +24,26 @@ QString AbstractListModel::role(int columnNumber) const
 
 QVariant AbstractListModel::dataByStringRole(const QModelIndex &index, QString role) const
 {
-    return data(index, roleNames().key(role.toLatin1()));
+    int intRole = roleNames().key(role.toLatin1());
+
+    if (!roleNames().contains(intRole))
+        qCritical() << "invalid role" << role << intRole << roleNames().keys();
+
+    return data(index, intRole);
+}
+
+QVariantMap AbstractListModel::get(const int &index)
+{
+    QVariantMap res;
+
+    if (index >=0 && index < rowCount())
+    {
+        QHash<int, QByteArray> roles = roleNames();
+        foreach (int role, roles.keys())
+            res[roles[role]] = data(indexFromRow(index), role);
+    }
+
+    return res;
 }
 
 QVariant AbstractListModel::get(int i, QString role) const
@@ -37,13 +56,19 @@ QModelIndex AbstractListModel::indexFromRow(const int row) const
     return index(row, 0);
 }
 
-int AbstractListModel::findRow(const QVariant &value, const int &role) const
+int AbstractListModel::findRow(const QVariant &value, const QString &role) const
 {
+    int intRole = roleNames().key(role.toLatin1());
+
+    if (!roleNames().contains(intRole))
+        qCritical() << "invalid role" << role << intRole << roleNames().keys();
+
     for (int row=0; row<rowCount(); ++row)
     {
-        if (data(indexFromRow(row), role) == value)
+        if (data(indexFromRow(row), intRole) == value)
             return row;
     }
+
     return -1;
 }
 
