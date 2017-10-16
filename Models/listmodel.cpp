@@ -59,9 +59,20 @@ QVariant ListModel::data(const QModelIndex &index, int role) const
 {
     if (index.row()>=0 && index.row()<rowCount())
     {
-        ListItem *item = at(index.row());
-        if (item)
-            return item->data(role);
+        if (role == Qt::DisplayRole)
+        {
+            return data(index, Qt::UserRole+index.column()+1);
+        }
+        else if (roleNames().contains(role))
+        {
+            ListItem *item = at(index.row());
+            if (item)
+                return item->data(role);
+        }
+        else
+        {
+            qCritical() << "invalid role" << role << roleNames().keys();
+        }
     }
 
     return QVariant::Invalid;
@@ -237,9 +248,24 @@ void ListModel::itemDataChanged(QVector<int> roles)
     ListItem *item = qobject_cast<ListItem*>(sender());
     if (item)
     {
-        QModelIndex index = indexFromItem(item);
-        if (index.isValid())
-            emit dataChanged(index, index, roles);
+        auto min_max = std::minmax_element(roles.begin(), roles.end());
+        int minRole = *min_max.first;
+        int maxRole = *min_max.second;
+
+        QModelIndex topLeftIndex = indexFromItem(item);
+        QModelIndex bottomRightIndex = topLeftIndex;
+
+        if (minRole != -1 && minRole > Qt::UserRole)
+            topLeftIndex = index(topLeftIndex.row(), minRole-Qt::UserRole-1);
+        if (maxRole != -1 && maxRole > Qt::UserRole)
+            bottomRightIndex = index(bottomRightIndex.row(), maxRole-Qt::UserRole-1);
+
+        roles << Qt::DisplayRole;
+
+        if (topLeftIndex.isValid() && bottomRightIndex.isValid())
+            emit dataChanged(topLeftIndex, bottomRightIndex, roles);
+        else
+            qCritical() << "invalid index" << topLeftIndex << bottomRightIndex;
     }
 }
 

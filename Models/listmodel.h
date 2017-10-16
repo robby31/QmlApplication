@@ -30,7 +30,7 @@ public:
 
     QModelIndex indexFromItem(const ListItem* item) const;
 
-    void clear();
+    Q_INVOKABLE void clear();
 
     ListItem *takeRow(int row);
     void appendRow(ListItem* item) { appendRows(QList<ListItem*>() << item); }
