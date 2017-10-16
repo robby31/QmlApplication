@@ -29,7 +29,6 @@ public:
 private:
     bool readConfig();
     bool append_data(const QString &param, const QString &value);
-    ListModel *create_parametersModel();
 
 signals:
 
