@@ -1,5 +1,5 @@
-#ifndef APPCONTROLLER_H
-#define APPCONTROLLER_H
+#ifndef UISERVICES_H
+#define UISERVICES_H
 
 #include <QObject>
 #include <QTimer>
@@ -44,4 +44,4 @@ private:
     PopupType m_popupType;
 };
 
-#endif // APPCONTROLLER_H
+#endif // UISERVICES_H
