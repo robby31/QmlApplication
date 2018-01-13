@@ -127,22 +127,45 @@ QString CheckedSqlListModel::checkedFilterCmd()
 {
     QString strRole = roleNames()[Qt::UserRole];
 
+    bool filteredStringNull = false;
     QStringList filteredString;
     foreach (const QString &name, m_filteredName)
     {
-        if (!name.contains("'"))
+        if (name.isNull())
+            filteredStringNull = true;
+        else if (!name.contains("'"))
             filteredString << QString("'%1'").arg(name);
         else
             filteredString << QString("\"%1\"").arg(name);
     }
 
-    if (m_allChecked  && !filteredString.isEmpty())
+    if (m_allChecked  && (!filteredString.isEmpty() or filteredStringNull))
     {
-        return QString("%1 not in (%2)").arg(strRole).arg(filteredString.join(','));
+        if (!filteredString.isEmpty())
+        {
+            if (filteredStringNull)
+                return QString("%1 not in (%2)").arg(strRole).arg(filteredString.join(','));
+            else
+                return QString("(%1 is null or %1 not in (%2))").arg(strRole).arg(filteredString.join(','));
+        }
+        else if (filteredStringNull)
+        {
+            return QString("%1 is not null").arg(strRole);
+        }
     }
-    else if (!m_allChecked && !filteredString.isEmpty())
+    else if (!m_allChecked && (!filteredString.isEmpty() or filteredStringNull))
     {
-        return QString("%1 in (%2)").arg(strRole).arg(filteredString.join(','));
+        if (!filteredString.isEmpty())
+        {
+            if (filteredStringNull)
+                return QString("(%1 is null or %1 in (%2))").arg(strRole).arg(filteredString.join(','));
+            else
+                return QString("%1 in (%2)").arg(strRole).arg(filteredString.join(','));
+        }
+        else if (filteredStringNull)
+        {
+            return QString("%1 is null").arg(strRole);
+        }
     }
 
     return QString();
