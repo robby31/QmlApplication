@@ -19,9 +19,9 @@ CheckedSqlListModel::CheckedSqlListModel(QObject *parent) :
 void CheckedSqlListModel::init_query()
 {
     if (!m_queryData.isEmpty() && !m_parameter.isEmpty())
-        setQuery(QString("SELECT DISTINCT %2 from (%1) ORDER BY %2").arg(m_queryData).arg(m_parameter));
+        setQuery(QString("SELECT DISTINCT %2 from (%1) AS checked_query").arg(m_queryData).arg(m_parameter));
     else if (!tablename().isEmpty() && !m_parameter.isEmpty())
-        setQuery(QString("SELECT DISTINCT %2 from %1 ORDER BY %2").arg(tablename()).arg(m_parameter));
+        setQuery(QString("SELECT DISTINCT %2 from %1").arg(tablename()).arg(m_parameter));
     else
         setQuery(QString());
 }
@@ -180,4 +180,12 @@ void CheckedSqlListModel::setTextFilter(const QString &text)
         setFilter(QString("%1 LIKE '%%%2%%'").arg(m_parameter).arg(text));
     else
         setFilter("");
+}
+
+void CheckedSqlListModel::setParameter(const QString &value)
+{
+    m_parameter = value;
+    emit parameterChanged();
+
+    setOrderBy(m_parameter);
 }

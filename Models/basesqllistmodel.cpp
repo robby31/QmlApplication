@@ -98,7 +98,7 @@ void BaseSqlListModel::setTablename(const QString &name)
 
 QString BaseSqlListModel::query()
 {
-    return mSqlQuery.lastQuery();
+    return mStringQuery;
 }
 
 QString BaseSqlListModel::tablename()
@@ -204,17 +204,23 @@ void BaseSqlListModel::update_query()
     if (filterCmd().isEmpty())
         filteredStringQuery = mStringQuery;
     else
-        filteredStringQuery = QString("SELECT * from (%1) WHERE %2").arg(mStringQuery).arg(filterCmd());
+        filteredStringQuery = QString("SELECT * from (%1) AS filtered_query WHERE %2").arg(mStringQuery).arg(filterCmd());
+
+    if (!m_orderBy.isEmpty())
+        filteredStringQuery += QString(" ORDER BY %1").arg(m_orderBy);
 
     beginResetModel();
     mRoles.clear();
     mRecords.clear();
 
+    qint64 execQueryPerfo = -1;
     if (mSqlQuery.driver()->isOpen() && !filteredStringQuery.isEmpty())
     {
         mSqlQuery.clear();
+        mSqlQuery.setForwardOnly(true);
         if (mSqlQuery.exec(filteredStringQuery))
         {
+            execQueryPerfo = timer.elapsed();
             while (mSqlQuery.next()){
 
                 if (!mSqlQuery.at())
@@ -225,6 +231,7 @@ void BaseSqlListModel::update_query()
                 }
 
                 mRecords.append(mSqlQuery.record());
+
             }
         }
         else
@@ -248,7 +255,7 @@ void BaseSqlListModel::update_query()
     emit lastErrorChanged();
 
     if (timer.elapsed() > 250)
-        qDebug() << "perfo query" << timer.elapsed() << mSqlQuery.lastQuery();
+        qDebug() << "perfo query" << timer.elapsed() << "query executed in" << execQueryPerfo << "size" << rowCount() << mSqlQuery.lastQuery();
 }
 
 QString BaseSqlListModel::connectionName()
@@ -261,7 +268,7 @@ void BaseSqlListModel::setConnectionName(const QString &name)
     mconnectionName = name;
     emit connectionNameChanged();
 
-    if (getPragma("foreign_keys").toBool())
+    if (GET_DATABASE(mconnectionName).driverName() == "SQLITE" && getPragma("foreign_keys").toBool())
         readForeignKeys();
 
     mSqlQuery = QSqlQuery(GET_DATABASE(mconnectionName));
@@ -369,30 +376,38 @@ bool BaseSqlListModel::readForeignKeys()
 {
     QSqlDatabase db = GET_DATABASE(mconnectionName);
 
-    if (db.isValid() && db.isOpen())
+    if (db.driverName() == "SQLITE")
     {
-        m_foreignKeys.clear();
-
-        QSqlQuery query(db);
-        foreach(QString tableName, db.tables())
+        if (db.isValid() && db.isOpen())
         {
-            query.exec(QString("pragma foreign_key_list(%1);").arg(tableName));
-            while (query.next())
-            {
-                QHash<QString, QString> tmp;
-                tmp["table"] = query.value("table").toString();
-                tmp["to"] = query.value("to").toString();
-                m_foreignKeys[tableName][query.value("from").toString()] = tmp;
-            }
-        }
+            m_foreignKeys.clear();
 
-        qDebug() << "read foreign keys" << m_foreignKeys;
-        return true;
+            QSqlQuery query(db);
+            foreach(QString tableName, db.tables())
+            {
+                query.exec(QString("pragma foreign_key_list(%1);").arg(tableName));
+                while (query.next())
+                {
+                    QHash<QString, QString> tmp;
+                    tmp["table"] = query.value("table").toString();
+                    tmp["to"] = query.value("to").toString();
+                    m_foreignKeys[tableName][query.value("from").toString()] = tmp;
+                }
+            }
+
+            qDebug() << "read foreign keys" << m_foreignKeys;
+            return true;
+        }
+        else
+        {
+            qCritical() << "database (name ="<< mconnectionName << ") is not valid or open, unable to read foreign keys.";
+            return false;
+        }
     }
     else
     {
-        qCritical() << "database (name ="<< mconnectionName << ") is not valid or open, unable to read foreign keys.";
-        return false;
+        qWarning() << "foreign keys not supported" << db.driverName();
+        return true;
     }
 }
 
@@ -420,4 +435,15 @@ int BaseSqlListModel::append(const QVariantMap &data)
     {
         return query.lastInsertId().toInt();
     }
+}
+
+QString BaseSqlListModel::orderBy() const
+{
+    return m_orderBy;
+}
+
+void BaseSqlListModel::setOrderBy(const QString &cmd)
+{
+    m_orderBy = cmd;
+    emit orderByChanged();
 }

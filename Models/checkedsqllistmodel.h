@@ -16,7 +16,7 @@ public:
     explicit CheckedSqlListModel(QObject *parent = 0);
 
     QString parameter() const { return m_parameter; }
-    void setParameter(const QString &value) { m_parameter = value; emit parameterChanged(); }
+    void setParameter(const QString &value);
 
     bool allchecked() const { return m_allChecked; }
     void setAllChecked(const bool &flag) { m_allChecked = flag; emit allcheckedChanged(); }

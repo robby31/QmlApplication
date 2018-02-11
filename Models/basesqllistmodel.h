@@ -16,6 +16,7 @@ class BaseSqlListModel : public AbstractListModel
     Q_PROPERTY (QString query READ query WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY (QString tablename READ tablename WRITE setTablename NOTIFY tablenameChanged)
     Q_PROPERTY (QString lastError READ lastError NOTIFY lastErrorChanged)
+    Q_PROPERTY (QString orderBy READ orderBy WRITE setOrderBy NOTIFY orderByChanged)
 
 public:
     explicit BaseSqlListModel(QObject *parent = 0);
@@ -53,6 +54,9 @@ public:
 
     void addCustomRole(const QByteArray &role);
 
+    QString orderBy() const;
+    void setOrderBy(const QString &cmd);
+
 private:
     bool add_role(const QByteArray &roleName);
 
@@ -63,6 +67,7 @@ signals:
     void queryChanged();
     void tablenameChanged();
     void lastErrorChanged();
+    void orderByChanged();
 
 public slots:
     void reload();
@@ -84,6 +89,7 @@ private:
     QString m_filtercmd;
     QList<QByteArray> m_customRoles;
     QHash<QString, QHash<QString, QHash<QString, QString> > > m_foreignKeys;
+    QString m_orderBy;
 };
 
 #endif // BASESQLLISTMODEL_H
