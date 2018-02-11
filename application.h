@@ -26,7 +26,8 @@ class Application : public QApplication
 
     Q_PROPERTY(QString databaseDriverName READ databaseDriverName WRITE setdatabaseDiverName NOTIFY databaseDriverNameChanged)
     Q_PROPERTY(QString databaseConnectionName READ databaseConnectionName WRITE setdatabaseConnectionName NOTIFY databaseConnectionNameChanged)
-    Q_PROPERTY(QUrl databasePathName READ databasePathName WRITE setdatabasePathName NOTIFY databasePathNameChanged)
+    Q_PROPERTY(QString databaseName READ databaseName WRITE setdatabaseName NOTIFY databaseNameChanged)
+    Q_PROPERTY(bool isConnected READ isConnected NOTIFY isConnectedChanged)
 
 public:
     explicit Application(int &argc, char **argv);
@@ -51,10 +52,12 @@ public:
 
     void setdatabaseOptions(const QString &options);
 
-    QUrl databasePathName() const;
-    void setdatabasePathName(const QUrl path);
+    QString databaseName() const;
+    void setdatabaseName(const QString name);
 
     QSqlDatabase database() const;
+
+    bool isConnected() const;
 
 signals:
     void loadMainQmlSignal(const QUrl &qmlMain);
@@ -62,10 +65,11 @@ signals:
 
     void databaseDriverNameChanged();
     void databaseConnectionNameChanged();
-    void databasePathNameChanged();
-    void databaseOpened(const QUrl &path);
+    void databaseNameChanged();
+    void databaseOpened(const QString &databaseName);
     void createDatabaseSignal(const QString &driverName, const QString &connectionName);
     void databaseOptionsSignal(const QString &options);
+    void isConnectedChanged();
 
 private slots:
     void objectCreated(QObject *obj, const QUrl &url);
@@ -79,7 +83,7 @@ private:
 
     QString m_databaseDriverName;
     QString m_databaseConnectionName;
-    QUrl m_databasePathName;
+    QString m_databaseName;
 };
 
 #endif // APPLICATION_H

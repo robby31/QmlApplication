@@ -38,7 +38,7 @@ Application::Application(int &argc, char **argv) :
     addToBackend(worker);
     connect(this, SIGNAL(createDatabaseSignal(QString,QString)), worker, SLOT(createDatabase(QString,QString)));
     connect(this, SIGNAL(databaseOptionsSignal(QString)), worker, SLOT(databaseOptions(QString)));
-    connect(this, SIGNAL(databaseOpened(QUrl)), worker, SLOT(databaseOpened(QUrl)));
+    connect(this, SIGNAL(databaseOpened(QString)), worker, SLOT(databaseOpened(QString)));
 }
 
 void Application::setMainWindowTitle(const QString &name)
@@ -142,17 +142,17 @@ void Application::setdatabaseOptions(const QString &options)
     }
 }
 
-QUrl Application::databasePathName() const
+QString Application::databaseName() const
 {
-    return m_databasePathName;
+    return m_databaseName;
 }
 
-void Application::setdatabasePathName(const QUrl path)
+void Application::setdatabaseName(const QString name)
 {
-    m_databasePathName.clear();
+    m_databaseName.clear();
 
     QSqlDatabase db = GET_DATABASE(databaseConnectionName());
-    qDebug() << QThread::currentThread() << "OPEN DATABASE" << path;
+    qDebug() << QThread::currentThread() << "OPEN DATABASE" << name;
 
     if (!db.isValid())
     {
@@ -160,31 +160,23 @@ void Application::setdatabasePathName(const QUrl path)
     }
     else
     {
-        if (path.isLocalFile())
+        if (db.isOpen())
+            db.close();
+
+        db.setDatabaseName(name);
+
+        if (!db.open())
         {
-
-            if (db.isOpen())
-                db.close();
-
-            db.setDatabaseName(path.toLocalFile());
-
-            if (!db.open())
-            {
-                qCritical() << "unable to open database" << db.lastError().text();
-            }
-            else
-            {
-                m_databasePathName = path;
-                emit databaseOpened(path);
-            }
+            qCritical() << "unable to open database" << db.lastError().text();
         }
-        else if (!path.isEmpty())
+        else
         {
-            qCritical() << "invalid database pathname" << path;
+            m_databaseName = name;
+            emit databaseOpened(name);
         }
     }
 
-    emit databasePathNameChanged();
+    emit databaseNameChanged();
 }
 
 void Application::createDatabase()
@@ -205,4 +197,10 @@ QSqlDatabase Application::database() const
 void Application::addImageProvider(const QString &id, QQmlImageProviderBase *provider)
 {
     qmlEngine.addImageProvider(id, provider);
+}
+
+bool Application::isConnected() const
+{
+    QSqlDatabase db = database();
+    return db.isOpen();
 }
