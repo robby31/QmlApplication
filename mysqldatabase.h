@@ -21,7 +21,7 @@
 // returns database created in the current thread based on connection name
 // if no connection name is found or if the connection has been established
 //    in another thread an invalid connection is returned
-#define GET_DATABASE(name) QSqlDatabase::database(CONNECTION_NAME(name))
+#define GET_DATABASE(name) QSqlDatabase::database(CONNECTION_NAME(name), false)
 
 
 // create database and define connectioName related to current Thread
