@@ -21,7 +21,7 @@ public:
 private slots:
     void createDatabase(const QString &driverName, const QString &connectionName);
     void databaseOptions(const QString &options);
-    void databaseOpened(const QUrl &path);
+    void databaseOpened(const QString &databaseName);
 
 private:
     QString m_databaseConnectionName;

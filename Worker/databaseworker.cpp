@@ -24,9 +24,9 @@ void DatabaseWorker::databaseOptions(const QString &options)
         qCritical() << QThread::currentThread() << "invalid database, unable to set options" << options;
 }
 
-void DatabaseWorker::databaseOpened(const QUrl &path)
+void DatabaseWorker::databaseOpened(const QString &databaseName)
 {
-    qDebug() << QThread::currentThread() << "OPEN DATABASE" << path;
+    qDebug() << QThread::currentThread() << "OPEN DATABASE" << databaseName;
 
     QSqlDatabase db = GET_DATABASE(databaseConnectionName());
 
@@ -36,22 +36,14 @@ void DatabaseWorker::databaseOpened(const QUrl &path)
     }
     else
     {
-        if (path.isLocalFile())
+        if (db.isOpen())
+            db.close();
+
+        db.setDatabaseName(databaseName);
+
+        if (!db.open())
         {
-
-            if (db.isOpen())
-                db.close();
-
-            db.setDatabaseName(path.toLocalFile());
-
-            if (!db.open())
-            {
-                qCritical() << "unable to open database" << db.lastError().text();
-            }
-        }
-        else
-        {
-            qCritical() << "invalid database pathname" << path;
+            qCritical() << "unable to open database" << db.lastError().text();
         }
     }
 }
