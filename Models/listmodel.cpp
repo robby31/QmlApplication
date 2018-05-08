@@ -260,7 +260,8 @@ void ListModel::itemDataChanged(QVector<int> roles)
         if (maxRole != -1 && maxRole > Qt::UserRole)
             bottomRightIndex = index(bottomRightIndex.row(), maxRole-Qt::UserRole-1);
 
-        roles << Qt::DisplayRole;
+        if (!roles.isEmpty())
+            roles << Qt::DisplayRole;
 
         if (topLeftIndex.isValid() && bottomRightIndex.isValid())
             emit dataChanged(topLeftIndex, bottomRightIndex, roles);
