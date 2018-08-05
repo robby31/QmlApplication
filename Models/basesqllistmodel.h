@@ -18,8 +18,14 @@ class BaseSqlListModel : public AbstractListModel
     Q_PROPERTY (QString lastError READ lastError NOTIFY lastErrorChanged)
     Q_PROPERTY (QString orderBy READ orderBy WRITE setOrderBy NOTIFY orderByChanged)
 
+    typedef struct {
+        QModelIndex topLeft;
+        QModelIndex bottomRight;
+        QVector<int> roles;
+    } T_DATACHANGED;
+
 public:
-    explicit BaseSqlListModel(QObject *parent = 0);
+    explicit BaseSqlListModel(QObject *parent = Q_NULLPTR);
 
     QVariant getPragma(const QString &param);
 
@@ -70,6 +76,7 @@ signals:
     void orderByChanged();
 
 public slots:
+    void resetModel();
     void reload();
 
     // update filtering
