@@ -34,13 +34,7 @@ double PivotModel::total()
         {
             return query.record().value(0).toDouble();
         }
-        else
-        {
-            return 0.0;
-        }
     }
-    else
-    {
-        return 0.0;
-    }
+
+    return 0.0;
 }

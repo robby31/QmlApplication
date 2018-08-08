@@ -13,16 +13,16 @@ class AbstractListModel : public QAbstractItemModel
     Q_PROPERTY(bool isFiltered READ isFiltered NOTIFY isFilteredChanged)
 
 public:
-    explicit AbstractListModel(QObject *parent = 0);
+    explicit AbstractListModel(QObject *parent = Q_NULLPTR);
 
     virtual QModelIndex index(int row, int column,
                               const QModelIndex &parent = QModelIndex()) const { Q_UNUSED(parent) return createIndex(row, column, quintptr(0)); }
     virtual QModelIndex parent(const QModelIndex &child) const { Q_UNUSED(child); return QModelIndex(); }
 
-    Q_INVOKABLE QVariant dataByStringRole(const QModelIndex &index, QString role) const;
+    Q_INVOKABLE QVariant dataByStringRole(const QModelIndex &index, const QString &role) const;
 
     Q_INVOKABLE QVariantMap get(const int &index);
-    Q_INVOKABLE QVariant get(int i, QString role) const;
+    Q_INVOKABLE QVariant get(int i, const QString &role) const;
 
     Q_INVOKABLE virtual QString role(int columnNumber) const;
     Q_INVOKABLE QString title(int columnNumber) const { return headerData(columnNumber, Qt::Horizontal).toString(); }

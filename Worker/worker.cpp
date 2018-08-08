@@ -14,15 +14,14 @@ Worker::Worker(QObject *parent) :
 bool Worker::processWasAborted()
 {
     QCoreApplication::processEvents();
+
     if (m_running)
     {
         return false;
     }
-    else
-    {
-        emit processAborted();
-        return true;
-    }
+
+    emit processAborted();
+    return true;
 }
 
 void Worker::_processStarted()

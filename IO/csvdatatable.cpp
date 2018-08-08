@@ -2,10 +2,7 @@
 
 CsvDataTable::CsvDataTable(QObject *parent):
     QObject(parent),
-    l_title(),
-    l_data(),
-    m_titleLine(),
-    l_lines()
+    m_titleLine()
 {
 }
 
@@ -27,7 +24,7 @@ void CsvDataTable::appendData(const QStringList &data, QHash<QString, QVariant> 
     }
 }
 
-bool CsvDataTable::dataFiltered(QStringList data, QHash<QString, QVariant> *filter, QHash<QString, CheckedListModel *> *columnsDataModel)
+bool CsvDataTable::dataFiltered(const QStringList &data, QHash<QString, QVariant> *filter, QHash<QString, CheckedListModel *> *columnsDataModel)
 {
     if (filter && !filter->isEmpty())
     {
@@ -47,7 +44,7 @@ bool CsvDataTable::dataFiltered(QStringList data, QHash<QString, QVariant> *filt
             int index = l_title.indexOf(title);
             if (index>=0 && index<data.count())
             {
-                QString value = data.at(index);
+                const QString& value = data.at(index);
 
                 CheckedListModel *model = columnsDataModel->operator [](title);
                 if (model)
@@ -70,103 +67,104 @@ bool CsvDataTable::loadFile(const QString &pathname, QHash<QString, QVariant> *f
     m_titleLine.clear();
     l_lines.clear();
 
-    QFile fd(pathname);    
-    if (fd.open(QIODevice::ReadOnly)) {
-        QTextStream textFile(&fd);
+    QFile fd(pathname);
 
-        // read first line: titles
-        if (!textFile.atEnd()) {
-            QString line(textFile.readLine());
-            m_titleLine = line;
-            foreach (const QString &data, line.split(";"))
-                l_title << data;
-        }
+    if (!fd.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "Unable to read" << fd.fileName();
+        return false;
+    }
 
-        // read data
-        while (!textFile.atEnd()) {
-            QString line(textFile.readLine());
+    QTextStream textFile(&fd);
 
-            QStringList tmp;
-            if (line.contains('"'))
+    // read first line: titles
+    if (!textFile.atEnd()) {
+        QString line(textFile.readLine());
+        m_titleLine = line;
+        foreach (const QString &data, line.split(";"))
+            l_title << data;
+    }
+
+    // read data
+    while (!textFile.atEnd()) {
+        QString line(textFile.readLine());
+
+        QStringList tmp;
+        if (line.contains('"'))
+        {
+            int offset = 0;
+            QRegularExpression patternBegin("(^|;)\"");
+            QRegularExpression patternEnd("\"(;|$)");
+
+            QRegularExpressionMatch matchBegin = patternBegin.match(line, offset);
+            while (matchBegin.hasMatch())
             {
-                int offset = 0;
-                QRegularExpression patternBegin("(^|;)\"");
-                QRegularExpression patternEnd("\"(;|$)");
-
-                QRegularExpressionMatch matchBegin = patternBegin.match(line, offset);
-                while (matchBegin.hasMatch())
-                {
-                    QString text = line.left(matchBegin.capturedStart()).right(matchBegin.capturedStart()-offset);
-//                    qWarning() << "BEGIN" << matchBegin.capturedStart() << matchBegin.capturedEnd() << text;
-                    if (!text.isEmpty())
-                    {
-                        if (offset>0 && text.startsWith(';'))
-                            text = text.right(text.size()-1);
-                        tmp << text.split(';');
-                    }
-
-                    offset = matchBegin.capturedEnd();
-
-                    QRegularExpressionMatch matchEnd = patternEnd.match(line, offset);
-                    while (!matchEnd.hasMatch() && !textFile.atEnd())
-                    {
-                        line += textFile.readLine();
-                        matchEnd = patternEnd.match(line, offset);
-                    }
-
-                    if (matchEnd.hasMatch())
-                    {
-                        QString text = line.left(matchEnd.capturedStart()).right(matchEnd.capturedStart()-offset);
-//                        qWarning() << "END" << matchEnd.capturedStart() << matchEnd.capturedEnd() << text;
-                        tmp << text;
-                        offset = matchEnd.capturedEnd()-1;
-                    }
-
-                    matchBegin = patternBegin.match(line, offset);
-//                    qWarning() << "NEW LOOP" << line.left(offset);
-                }
-
-                QString text = line.right(line.size()-offset);
-//                qWarning() << "BREAK" << text;
+                QString text = line.left(matchBegin.capturedStart()).right(matchBegin.capturedStart()-offset);
+                //                    qWarning() << "BEGIN" << matchBegin.capturedStart() << matchBegin.capturedEnd() << text;
                 if (!text.isEmpty())
                 {
-                    if (text.startsWith(';'))
+                    if (offset>0 && text.startsWith(';'))
                         text = text.right(text.size()-1);
                     tmp << text.split(';');
                 }
+
+                offset = matchBegin.capturedEnd();
+
+                QRegularExpressionMatch matchEnd = patternEnd.match(line, offset);
+                while (!matchEnd.hasMatch() && !textFile.atEnd())
+                {
+                    line += textFile.readLine();
+                    matchEnd = patternEnd.match(line, offset);
+                }
+
+                if (matchEnd.hasMatch())
+                {
+                    QString text = line.left(matchEnd.capturedStart()).right(matchEnd.capturedStart()-offset);
+                    //                        qWarning() << "END" << matchEnd.capturedStart() << matchEnd.capturedEnd() << text;
+                    tmp << text;
+                    offset = matchEnd.capturedEnd()-1;
+                }
+
+                matchBegin = patternBegin.match(line, offset);
+                //                    qWarning() << "NEW LOOP" << line.left(offset);
             }
-            else
+
+            QString text = line.right(line.size()-offset);
+            //                qWarning() << "BREAK" << text;
+            if (!text.isEmpty())
             {
-                tmp = line.split(";");
+                if (text.startsWith(';'))
+                    text = text.right(text.size()-1);
+                tmp << text.split(';');
             }
-
-            if (tmp.count() != l_title.count())
-            {
-                qWarning() << "WARNING, columns number differ compared to titles" << tmp.count() << l_title.count();
-                qWarning() << line;
-                qWarning() << tmp;
-            }
-
-
-
-            if (!dataFiltered(tmp, filter, columnsDataModel))
-            {
-                l_data.append(tmp);
-                l_lines << line;
-            }
-
-            tmp.clear();
+        }
+        else
+        {
+            tmp = line.split(";");
         }
 
-        // close file
-        fd.close();
+        if (tmp.count() != l_title.count())
+        {
+            qWarning() << "WARNING, columns number differ compared to titles" << tmp.count() << l_title.count();
+            qWarning() << line;
+            qWarning() << tmp;
+        }
 
-        return true;
-    } else {
-        qWarning() << "Unable to read" << fd.fileName();
+
+
+        if (!dataFiltered(tmp, filter, columnsDataModel))
+        {
+            l_data.append(tmp);
+            l_lines << line;
+        }
+
+        tmp.clear();
     }
 
-    return false;
+    // close file
+    fd.close();
+
+    return true;
 }
 
 bool CsvDataTable::loadFile(CsvDataTable *input, QHash<QString, QVariant> *filter, QHash<QString, CheckedListModel *> *columnsDataModel)

@@ -2,10 +2,8 @@
 
 Application::Application(int &argc, char **argv) :
     QApplication(argc, argv),
-    backend(),
     qmlEngine(this),
-    uiServices(this),
-    mainUrl()
+    uiServices(this)
 {
 #if defined(WEBENGINE_PACKAGE)
     QtWebEngine::initialize();
@@ -34,7 +32,7 @@ Application::Application(int &argc, char **argv) :
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 
     // worker to initialize database in backend Thread
-    DatabaseWorker *worker = new DatabaseWorker();
+    auto worker = new DatabaseWorker();
     addToBackend(worker);
     connect(this, SIGNAL(createDatabaseSignal(QString,QString)), worker, SLOT(createDatabase(QString,QString)));
     connect(this, SIGNAL(databaseOptionsSignal(QString)), worker, SLOT(databaseOptions(QString)));
@@ -147,7 +145,7 @@ QString Application::databaseName() const
     return m_databaseName;
 }
 
-void Application::setdatabaseName(const QString name)
+void Application::setdatabaseName(const QString &name)
 {
     m_databaseName.clear();
 

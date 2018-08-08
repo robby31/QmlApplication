@@ -18,11 +18,11 @@ QString AbstractListModel::role(int columnNumber) const
 
     if (roles.contains(Qt::UserRole+columnNumber+1))
         return roles[Qt::UserRole+columnNumber+1];
-    else
-        return QString();
+
+    return QString();
 }
 
-QVariant AbstractListModel::dataByStringRole(const QModelIndex &index, QString role) const
+QVariant AbstractListModel::dataByStringRole(const QModelIndex &index, const QString &role) const
 {
     int intRole = roleNames().key(role.toLatin1());
 
@@ -46,7 +46,7 @@ QVariantMap AbstractListModel::get(const int &index)
     return res;
 }
 
-QVariant AbstractListModel::get(int i, QString role) const
+QVariant AbstractListModel::get(int i, const QString &role) const
 {
     return dataByStringRole(indexFromRow(i), role);
 }

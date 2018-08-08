@@ -2,7 +2,6 @@
 
 UiServices::UiServices(QObject *parent) :
     QObject(parent),
-    m_timer(),
     m_popupVisible(false),
     m_popupText(""),
     m_popupType(POP_ERROR)

@@ -1,10 +1,7 @@
 #include "tablemodel.h"
 
 TableModel::TableModel(QObject *parent):
-    AbstractListModel(parent),
-    m_roles(),
-    m_columnNames(),
-    m_rowNames()
+    AbstractListModel(parent)
 {
 }
 
@@ -22,18 +19,18 @@ int TableModel::columnCount(const QModelIndex &parent) const
 
 QVariant TableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation == Qt::Horizontal) {
-        if (role == Qt::DisplayRole) {
+    if (orientation == Qt::Horizontal)
+    {
+        if (role == Qt::DisplayRole)
+        {
             if (section < m_columnNames.size())
                 return m_columnNames.at(section);
-            else
-                return QVariant::Invalid;
-        } else {
-            return AbstractListModel::headerData(section, orientation, role);
+
+            return QVariant::Invalid;
         }
-    } else {
-        return AbstractListModel::headerData(section, orientation, role);
     }
+
+    return AbstractListModel::headerData(section, orientation, role);
 }
 
 void TableModel::setRowNames(const QStringList &names)
@@ -73,16 +70,16 @@ QString TableModel::columnColor(const int &index)
 {
     if (index > 0)
         return "#804682B4";
-    else
-        return "transparent";
+
+    return "transparent";
 }
 
 QString TableModel::itemColor(const int &index)
 {
     if (index == 0)
         return "#804682B4";
-    else
-        return "transparent";
+
+    return "transparent";
 }
 
 QVariant TableModel::data(const QModelIndex &index, int role) const

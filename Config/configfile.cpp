@@ -1,6 +1,6 @@
 #include "configfile.h"
 
-const QRegExp ConfigFile::tagBegin = QRegExp("^BEGIN\\((\\w+)\\)(.*)$");
+const QRegExp ConfigFile::tagBegin = QRegExp(R"(^BEGIN\((\w+)\)(.*)$)");
 const QRegExp ConfigFile::tagEnd = QRegExp("^END$");
 const QRegExp ConfigFile::paramDefinition = QRegExp("^([^=]+)=([^=]*)$");
 const QRegExp ConfigFile::paramInQuery = QRegExp("@\\w+@");
@@ -9,79 +9,75 @@ const QString ConfigFile::checkImagePath = "file:///"+QDir::currentPath()+"/Chec
 
 ConfigFile::ConfigFile(QObject *parent) :
     QFile(parent),
-    last_read(),
-    flag_read(false),
-    data(),
-    keys()
+    flag_read(false)
 {
 }
 
-ConfigFile::ConfigFile(QFileInfo fileinfo, QObject *parent) :
+ConfigFile::ConfigFile(const QFileInfo &fileinfo, QObject *parent) :
     QFile(fileinfo.absoluteFilePath(), parent),
-    last_read(),
-    flag_read(false),
-    data(),
-    keys()
+    flag_read(false)
 {
 }
 
-bool ConfigFile::readConfig() {
-    if (!flag_read) {
-        data.clear();
-        keys.clear();
-        QFileInfo fileinfo(fileName());
-        last_read = fileinfo.lastModified();
-        flag_read = true;
-
-        QString param;
-        QByteArray value;
-        bool flag_TAG = false;
-
-        if (open(QFile::ReadOnly))
-        {
-            QTextStream stream(this);
-            while (!stream.atEnd())
-            {
-                QString line = stream.readLine().trimmed();
-                line.replace(imageTag, checkImagePath);
-
-                if (!flag_TAG) {
-                    if (paramDefinition.indexIn(line) != -1) {
-                        append_data(paramDefinition.cap(1),
-                                    paramDefinition.cap(2));
-
-                    } else if (tagBegin.indexIn(line) != -1) {
-                        flag_TAG = true;
-                        param = tagBegin.cap(1);
-                        if (tagBegin.captureCount() == 2)
-                            value.append(tagBegin.cap(2));
-
-                    } else if (!line.isEmpty()) {
-                        qWarning() << "invalid configuration in file" << fileName();
-                        qWarning() << line;
-                    }
-                } else {
-                    if (tagEnd.indexIn(line) != -1) {
-                        append_data(param, value);
-                        flag_TAG = false;
-                        value.clear();
-                    } else {
-                        value.append(" "+line);
-                    }
-                }
-            }
-
-            close();
-
-            return true;
-        } else {
-            // cannot read the file
-            return false;
-        }
-    } else {
+bool ConfigFile::readConfig()
+{
+    if (flag_read)
+    {
         // no  need to read again the file
         return true;
     }
+
+    data.clear();
+    keys.clear();
+    QFileInfo fileinfo(fileName());
+    last_read = fileinfo.lastModified();
+    flag_read = true;
+
+    QString param;
+    QByteArray value;
+    bool flag_TAG = false;
+
+    if (!open(QFile::ReadOnly))
+    {
+        // cannot read the file
+        return false;
+    }
+
+    QTextStream stream(this);
+    while (!stream.atEnd())
+    {
+        QString line = stream.readLine().trimmed();
+        line.replace(imageTag, checkImagePath);
+
+        if (!flag_TAG) {
+            if (paramDefinition.indexIn(line) != -1) {
+                append_data(paramDefinition.cap(1),
+                            paramDefinition.cap(2));
+
+            } else if (tagBegin.indexIn(line) != -1) {
+                flag_TAG = true;
+                param = tagBegin.cap(1);
+                if (tagBegin.captureCount() == 2)
+                    value.append(tagBegin.cap(2));
+
+            } else if (!line.isEmpty()) {
+                qWarning() << "invalid configuration in file" << fileName();
+                qWarning() << line;
+            }
+        } else {
+            if (tagEnd.indexIn(line) != -1) {
+                append_data(param, value);
+                flag_TAG = false;
+                value.clear();
+            } else {
+                value.append(" "+line);
+            }
+        }
+    }
+
+    close();
+
+    return true;
 }
 
 bool ConfigFile::append_data(const QString &param, const QString &value) {
@@ -107,8 +103,8 @@ QString ConfigFile::getData(const QString &param) {
 
     if (data.contains(param))
         return data[param];
-    else
-        return QString();
+
+    return QString();
 }
 
 QStringList ConfigFile::getDataList(const QString &param)

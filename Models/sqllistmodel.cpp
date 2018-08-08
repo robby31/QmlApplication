@@ -2,10 +2,9 @@
 
 SqlListModel::SqlListModel(QObject *parent) :
     BaseSqlListModel(parent),
-    m_columnsToFilter(0),
-    m_columnDataModel(0),
-    m_columnDataModels(),
-    m_columnToFilterSelected(0)
+    m_columnsToFilter(Q_NULLPTR),
+    m_columnDataModel(Q_NULLPTR),
+    m_columnToFilterSelected(Q_NULLPTR)
 {
     m_columnsToFilter = new ListModel(new FilteringColumnItem, this);
 
@@ -24,7 +23,7 @@ void SqlListModel::columnDataItemChanged(QModelIndex start, QModelIndex end)
     Q_UNUSED(start)
     Q_UNUSED(end)
 
-    CheckedSqlListModel *item = qobject_cast<CheckedSqlListModel*>(sender());
+    auto item = qobject_cast<CheckedSqlListModel*>(sender());
     if (item)
     {
         bool columnFiltered = !item->checkedFilterCmd().isEmpty();
@@ -60,10 +59,10 @@ void SqlListModel::setColumnDataModel(const QString &columnName)
         m_columnDataModel = m_columnDataModels[columnName];
     }
 
-    m_columnToFilterSelected = 0;
+    m_columnToFilterSelected = Q_NULLPTR;
     for (int index=0;index<m_columnsToFilter->rowCount();++index)
     {
-        FilteringColumnItem *item = qobject_cast<FilteringColumnItem*>(m_columnsToFilter->at(index));
+        auto item = qobject_cast<FilteringColumnItem*>(m_columnsToFilter->at(index));
         if (item)
         {
             QString name = item->data(FilteringColumnItem::NameRole).toString();

@@ -53,7 +53,7 @@ public:
     void setdatabaseOptions(const QString &options);
 
     QString databaseName() const;
-    void setdatabaseName(const QString name);
+    void setdatabaseName(const QString &name);
 
     QSqlDatabase database() const;
 

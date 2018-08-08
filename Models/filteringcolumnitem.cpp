@@ -48,15 +48,14 @@ bool FilteringColumnItem::setData(const QVariant &value, const int &role)
         emit itemChanged(roles);
         return true;
     }
-    else if (role == UsedRole)
+
+    if (role == UsedRole)
     {
         m_used = value.toBool();
         emit itemChanged(roles);
         return true;
     }
-    else
-    {
-        qWarning() << "invalid role" << role;
-        return false;
-    }
+
+    qWarning() << "invalid role" << role;
+    return false;
 }

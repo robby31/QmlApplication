@@ -13,10 +13,10 @@ class CsvDataTable : public QObject
     Q_OBJECT
 
 public:
-    explicit CsvDataTable(QObject *parent = 0);
+    explicit CsvDataTable(QObject *parent = Q_NULLPTR);
 
-    bool loadFile(const QString &pathname, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=0);
-    bool loadFile(CsvDataTable *input, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=0);
+    bool loadFile(const QString &pathname, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
+    bool loadFile(CsvDataTable *input, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
 
 signals:
 
@@ -32,14 +32,14 @@ public slots:
     bool isTitleValid(const QString &title) { return l_title.contains(title); }
 
     void setTitle(const QStringList &titles);
-    void appendData(const QStringList &data, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=0);
+    void appendData(const QStringList &data, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
 
     QString getValue(const int &index, const QString &param) const;
     QString getValue(const int &index, const int &column) const;
     int searchIndex(const QString &param, const QString &value) const;
 
 private:
-    bool dataFiltered(QStringList data, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=0);
+    bool dataFiltered(const QStringList &data, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
 
 private:
     QStringList l_title;

@@ -1,8 +1,6 @@
 #include "myrunnable.h"
 
 MyRunnable::MyRunnable():
-    QObject(),
-    QRunnable(),
     m_abort(false)
 {
 

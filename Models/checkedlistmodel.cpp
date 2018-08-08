@@ -25,10 +25,10 @@ CheckedItem *CheckedListModel::findByRole(const QVariant &value, const int &role
 {
     for (int row=0; row<m_list.size(); ++row)
     {
-        CheckedItem *item = qobject_cast<CheckedItem*>(m_list.at(row));
+        auto item = qobject_cast<CheckedItem*>(m_list.at(row));
         if (item && item->data(role) == value)
             return item;
     }
 
-    return 0;
+    return Q_NULLPTR;
 }

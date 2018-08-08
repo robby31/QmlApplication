@@ -4,7 +4,6 @@ CheckedSqlListModel::CheckedSqlListModel(QObject *parent) :
     BaseSqlListModel(parent),
     m_parameter(),
     m_allChecked(true),
-    m_filteredName(),
     m_textFilter(),
     m_queryData()
 {
@@ -36,13 +35,14 @@ QVariant CheckedSqlListModel::data(const QModelIndex &index, int role) const
 
         if (m_allChecked)
             return !m_filteredName.contains(name);
-        else
-            return m_filteredName.contains(name);
+
+        return m_filteredName.contains(name);
     }
-    else if (strRole == "name")
+
+    if (strRole == "name")
         return BaseSqlListModel::data(index, Qt::UserRole);
-    else
-        return BaseSqlListModel::data(index, role);
+
+    return BaseSqlListModel::data(index, role);
 }
 
 void CheckedSqlListModel::setQueryData(const QString &query)
@@ -70,14 +70,12 @@ bool CheckedSqlListModel::setData(const QModelIndex &index, const QVariant &valu
                 emit dataChanged(index, index, roles);
                 return true;
             }
-            else
+
+            if (m_filteredName.contains(name))
             {
-                if (m_filteredName.contains(name))
-                {
-                    m_filteredName.removeOne(name);
-                    emit dataChanged(index, index, roles);
-                    return true;
-                }
+                m_filteredName.removeOne(name);
+                emit dataChanged(index, index, roles);
+                return true;
             }
         }
         else
@@ -88,14 +86,12 @@ bool CheckedSqlListModel::setData(const QModelIndex &index, const QVariant &valu
                 emit dataChanged(index, index, roles);
                 return true;
             }
-            else
+
+            if (m_filteredName.contains(name))
             {
-                if (m_filteredName.contains(name))
-                {
-                    m_filteredName.removeOne(name);
-                    emit dataChanged(index, index, roles);
-                    return true;
-                }
+                m_filteredName.removeOne(name);
+                emit dataChanged(index, index, roles);
+                return true;
             }
         }
     }
@@ -145,13 +141,12 @@ QString CheckedSqlListModel::checkedFilterCmd()
         {
             if (filteredStringNull)
                 return QString("%1 not in (%2)").arg(strRole).arg(filteredString.join(','));
-            else
-                return QString("(%1 is null or %1 not in (%2))").arg(strRole).arg(filteredString.join(','));
+
+            return QString("(%1 is null or %1 not in (%2))").arg(strRole).arg(filteredString.join(','));
         }
-        else if (filteredStringNull)
-        {
+
+        if (filteredStringNull)
             return QString("%1 is not null").arg(strRole);
-        }
     }
     else if (!m_allChecked && (!filteredString.isEmpty() or filteredStringNull))
     {
@@ -159,13 +154,12 @@ QString CheckedSqlListModel::checkedFilterCmd()
         {
             if (filteredStringNull)
                 return QString("(%1 is null or %1 in (%2))").arg(strRole).arg(filteredString.join(','));
-            else
-                return QString("%1 in (%2)").arg(strRole).arg(filteredString.join(','));
+
+            return QString("%1 in (%2)").arg(strRole).arg(filteredString.join(','));
         }
-        else if (filteredStringNull)
-        {
+
+        if (filteredStringNull)
             return QString("%1 is null").arg(strRole);
-        }
     }
 
     return QString();

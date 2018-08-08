@@ -4,9 +4,7 @@
 ListModel::ListModel(ListItem* prototype, QObject *parent) :
     AbstractListModel(parent),
     m_prototype(prototype),
-    m_list(),
-    m_isFiltered(false),
-    m_filteredIndex()
+    m_isFiltered(false)
 {
     qRegisterMetaType<QVector<int> >("QVector<int>");
     connect(this, SIGNAL(filterRoleSignal(QString,QString)), this, SLOT(filterRoleSlot(QString,QString)));
@@ -15,9 +13,7 @@ ListModel::ListModel(ListItem* prototype, QObject *parent) :
 ListModel::ListModel(QObject *parent) :
     AbstractListModel(parent),
     m_prototype(),
-    m_list(),
-    m_isFiltered(false),
-    m_filteredIndex()
+    m_isFiltered(false)
 {
     qRegisterMetaType<QVector<int> >("QVector<int>");
     connect(this, SIGNAL(filterRoleSignal(QString,QString)), this, SLOT(filterRoleSlot(QString,QString)));
@@ -26,33 +22,33 @@ ListModel::ListModel(QObject *parent) :
 ListModel::~ListModel()
 {
     clear();
-    if (m_prototype)
-        delete m_prototype;
+    delete m_prototype;
 }
 
 QHash<int, QByteArray> ListModel::roleNames() const
 {
     if (m_prototype)
         return m_prototype->roleNames();
-    else
-        return QHash<int, QByteArray>();
+
+    return QHash<int, QByteArray>();
 }
 
 int ListModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
+
     if (!isFiltered())
         return m_list.size();
-    else
-        return m_filteredIndex.size();
+
+    return m_filteredIndex.size();
 }
 
 ListItem *ListModel::at(int row) const
 {
     if (!isFiltered())
         return m_list.at(row);
-    else
-        return m_list.at(m_filteredIndex.at(row));
+
+    return m_list.at(m_filteredIndex.at(row));
 }
 
 QVariant ListModel::data(const QModelIndex &index, int role) const
@@ -63,16 +59,15 @@ QVariant ListModel::data(const QModelIndex &index, int role) const
         {
             return data(index, Qt::UserRole+index.column()+1);
         }
-        else if (roleNames().contains(role))
+
+        if (roleNames().contains(role))
         {
             ListItem *item = at(index.row());
             if (item)
                 return item->data(role);
         }
-        else
-        {
-            qCritical() << "invalid role" << role << roleNames().keys();
-        }
+
+        qCritical() << "invalid role" << role << roleNames().keys();
     }
 
     return QVariant::Invalid;
@@ -86,7 +81,7 @@ ListItem * ListModel::find(const QString &id) const
         if (item && item->id() == id)
             return item;
     }
-    return 0;
+    return Q_NULLPTR;
 }
 
 int ListModel::findRow(const QString &id) const
@@ -119,6 +114,7 @@ QModelIndex ListModel::indexFromItem(const ListItem *item) const
                 return indexFromRow(row);
         }
     }
+
     return QModelIndex();
 }
 
@@ -177,7 +173,7 @@ void ListModel::insertRow(int row, ListItem *item)
 
 void ListModel::clear()
 {
-    if (m_list.size() > 0)
+    if (!m_list.isEmpty())
     {
         beginRemoveRows(QModelIndex(), 0, m_list.size()-1);
         qDeleteAll(m_list);
@@ -234,7 +230,7 @@ ListItem *ListModel::takeRow(int row)
     if (isFiltered())
     {
         qWarning() << "unable to remove row in filtered model";
-        return 0;
+        return Q_NULLPTR;
     }
 
     beginRemoveRows(QModelIndex(), row, row);
@@ -245,7 +241,7 @@ ListItem *ListModel::takeRow(int row)
 
 void ListModel::itemDataChanged(QVector<int> roles)
 {
-    ListItem *item = qobject_cast<ListItem*>(sender());
+    auto item = qobject_cast<ListItem*>(sender());
     if (item)
     {
         auto min_max = std::minmax_element(roles.begin(), roles.end());
@@ -255,9 +251,9 @@ void ListModel::itemDataChanged(QVector<int> roles)
         QModelIndex topLeftIndex = indexFromItem(item);
         QModelIndex bottomRightIndex = topLeftIndex;
 
-        if (minRole != -1 && minRole > Qt::UserRole)
+        if (minRole > Qt::UserRole)
             topLeftIndex = index(topLeftIndex.row(), minRole-Qt::UserRole-1);
-        if (maxRole != -1 && maxRole > Qt::UserRole)
+        if (maxRole > Qt::UserRole)
             bottomRightIndex = index(bottomRightIndex.row(), maxRole-Qt::UserRole-1);
 
         if (!roles.isEmpty())

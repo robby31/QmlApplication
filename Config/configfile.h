@@ -16,7 +16,7 @@ class ConfigFile : public QFile
 
 public:
     explicit ConfigFile(QObject *parent = 0);
-    ConfigFile(QFileInfo fileinfo, QObject *parent = 0);
+    ConfigFile(const QFileInfo &fileinfo, QObject *parent = 0);
 
     QList<QString> getKeys();
     QString getData(const QString &param);
