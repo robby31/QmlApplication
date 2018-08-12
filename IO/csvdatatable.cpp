@@ -28,25 +28,25 @@ bool CsvDataTable::dataFiltered(const QStringList &data, QHash<QString, QVariant
 {
     if (filter && !filter->isEmpty())
     {
-        foreach (const QString &param, filter->keys())
+        for (auto param = filter->constBegin(); param != filter->constEnd(); ++param)
         {
-            int index = l_title.indexOf(param);
+            int index = l_title.indexOf(param.key());
             if (index>=0 && index<data.count())
-                if (data.at(index) != filter->operator [](param))
+                if (data.at(index) != param.value())
                     return true;
         }
     }
 
     if (columnsDataModel && !columnsDataModel->isEmpty())
     {
-        foreach (const QString &title, columnsDataModel->keys())
+        for (auto title = columnsDataModel->constBegin(); title !=  columnsDataModel->constEnd(); ++title)
         {
-            int index = l_title.indexOf(title);
+            int index = l_title.indexOf(title.key());
             if (index>=0 && index<data.count())
             {
                 const QString& value = data.at(index);
 
-                CheckedListModel *model = columnsDataModel->operator [](title);
+                CheckedListModel *model = title.value();
                 if (model)
                 {
                     CheckedItem *item = model->findByRole(value, CheckedItem::NameRole);

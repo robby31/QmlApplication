@@ -27,7 +27,7 @@ double PivotModel::total()
     {
         QString cmd;
 
-        cmd = QString("SELECT sum(%1) FROM (%2)").arg(m_totalParam).arg(strQuery);
+        cmd = QString("SELECT sum(%1) FROM (%2)").arg(m_totalParam, strQuery);
 
         QSqlQuery query(GET_DATABASE(connectionName()));
         if (query.exec(cmd) && query.next())

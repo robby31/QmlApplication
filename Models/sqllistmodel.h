@@ -13,7 +13,7 @@ class SqlListModel : public BaseSqlListModel
     Q_PROPERTY(CheckedSqlListModel *columnDataModel READ columnDataModel NOTIFY columnDataModelChanged)
 
 public:
-    explicit SqlListModel(QObject *parent = 0);
+    explicit SqlListModel(QObject *parent = Q_NULLPTR);
 
     ListModel *columnsToFilter() const { return m_columnsToFilter; }
 
@@ -35,10 +35,10 @@ private slots:
 
 private:
     // configure filtering
-    ListModel *m_columnsToFilter;
-    CheckedSqlListModel *m_columnDataModel;
+    ListModel *m_columnsToFilter = Q_NULLPTR;
+    CheckedSqlListModel *m_columnDataModel = Q_NULLPTR;
     QHash<QString, CheckedSqlListModel*> m_columnDataModels;
-    FilteringColumnItem *m_columnToFilterSelected;
+    FilteringColumnItem *m_columnToFilterSelected = Q_NULLPTR;
 };
 
 #endif // SQLLISTMODEL_H

@@ -18,9 +18,9 @@ CheckedSqlListModel::CheckedSqlListModel(QObject *parent) :
 void CheckedSqlListModel::init_query()
 {
     if (!m_queryData.isEmpty() && !m_parameter.isEmpty())
-        setQuery(QString("SELECT DISTINCT %2 from (%1) AS checked_query").arg(m_queryData).arg(m_parameter));
+        setQuery(QString("SELECT DISTINCT %2 from (%1) AS checked_query").arg(m_queryData, m_parameter));
     else if (!tablename().isEmpty() && !m_parameter.isEmpty())
-        setQuery(QString("SELECT DISTINCT %2 from %1").arg(tablename()).arg(m_parameter));
+        setQuery(QString("SELECT DISTINCT %2 from %1").arg(tablename(), m_parameter));
     else
         setQuery(QString());
 }
@@ -140,9 +140,9 @@ QString CheckedSqlListModel::checkedFilterCmd()
         if (!filteredString.isEmpty())
         {
             if (filteredStringNull)
-                return QString("%1 not in (%2)").arg(strRole).arg(filteredString.join(','));
+                return QString("%1 not in (%2)").arg(strRole, filteredString.join(','));
 
-            return QString("(%1 is null or %1 not in (%2))").arg(strRole).arg(filteredString.join(','));
+            return QString("(%1 is null or %1 not in (%2))").arg(strRole, filteredString.join(','));
         }
 
         if (filteredStringNull)
@@ -153,9 +153,9 @@ QString CheckedSqlListModel::checkedFilterCmd()
         if (!filteredString.isEmpty())
         {
             if (filteredStringNull)
-                return QString("(%1 is null or %1 in (%2))").arg(strRole).arg(filteredString.join(','));
+                return QString("(%1 is null or %1 in (%2))").arg(strRole, filteredString.join(','));
 
-            return QString("%1 in (%2)").arg(strRole).arg(filteredString.join(','));
+            return QString("%1 in (%2)").arg(strRole, filteredString.join(','));
         }
 
         if (filteredStringNull)
@@ -171,7 +171,7 @@ void CheckedSqlListModel::setTextFilter(const QString &text)
     emit textFilterChanged();
 
     if (text != "")
-        setFilter(QString("%1 LIKE '%%%2%%'").arg(m_parameter).arg(text));
+        setFilter(QString("%1 LIKE '%%%2%%'").arg(m_parameter, text));
     else
         setFilter("");
 }

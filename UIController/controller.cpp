@@ -23,7 +23,7 @@ bool Controller::setActivity(const QString &activity)
 
     if (m_activity != "IDLE")
     {
-        popMessage(QString("%1 in progress, operation %2 not started").arg(m_activity).arg(activity),
+        popMessage(QString("%1 in progress, operation %2 not started").arg(m_activity, activity),
                    UiServices::POP_WARNING);
         return false;
     }

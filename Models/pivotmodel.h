@@ -10,7 +10,7 @@ class PivotModel : public SqlListModel
     Q_PROPERTY(double total READ total NOTIFY totalChanged)
 
 public:
-    explicit PivotModel(QObject *parent = 0);
+    explicit PivotModel(QObject *parent = Q_NULLPTR);
 
     double total();
     Q_INVOKABLE void setTotalParam(const QString &name);

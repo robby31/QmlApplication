@@ -15,9 +15,9 @@ class AbstractListModel : public QAbstractItemModel
 public:
     explicit AbstractListModel(QObject *parent = Q_NULLPTR);
 
-    virtual QModelIndex index(int row, int column,
-                              const QModelIndex &parent = QModelIndex()) const { Q_UNUSED(parent) return createIndex(row, column, quintptr(0)); }
-    virtual QModelIndex parent(const QModelIndex &child) const { Q_UNUSED(child); return QModelIndex(); }
+    QModelIndex index(int row, int column,
+                      const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE { Q_UNUSED(parent) return createIndex(row, column, quintptr(0)); }
+    QModelIndex parent(const QModelIndex &child) const Q_DECL_OVERRIDE { Q_UNUSED(child); return QModelIndex(); }
 
     Q_INVOKABLE QVariant dataByStringRole(const QModelIndex &index, const QString &role) const;
 
@@ -29,9 +29,9 @@ public:
 
     Q_INVOKABLE int findRow(const QVariant &value, const QString &role) const;
 
-    QModelIndex indexFromRow(const int row) const;
+    QModelIndex indexFromRow(const int& row) const;
 
-    Q_INVOKABLE bool setDataByStringRole(const int row, const QVariant &value, const QString &role);
+    Q_INVOKABLE bool setDataByStringRole(const int& row, const QVariant &value, const QString &role);
     Q_INVOKABLE bool setDataByStringRole(const QModelIndex &index, const QVariant &value, const QString &role);
 
     virtual bool isFiltered() const = 0;

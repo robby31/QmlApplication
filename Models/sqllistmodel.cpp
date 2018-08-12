@@ -1,10 +1,7 @@
 #include "sqllistmodel.h"
 
 SqlListModel::SqlListModel(QObject *parent) :
-    BaseSqlListModel(parent),
-    m_columnsToFilter(Q_NULLPTR),
-    m_columnDataModel(Q_NULLPTR),
-    m_columnToFilterSelected(Q_NULLPTR)
+    BaseSqlListModel(parent)
 {
     m_columnsToFilter = new ListModel(new FilteringColumnItem, this);
 
@@ -34,12 +31,10 @@ void SqlListModel::columnDataItemChanged(QModelIndex start, QModelIndex end)
 
 void SqlListModel::updateColumnDataModel()
 {
-    foreach (const QString &columnName, m_columnDataModels.keys())
+    for (auto column : m_columnDataModels)
     {
-        if (m_columnDataModels[columnName]->checkedFilterCmd().isEmpty())
-        {
-            m_columnDataModels[columnName]->setQueryData(query());
-        }
+        if (column->checkedFilterCmd().isEmpty())
+            column->setQueryData(query());
     }
 }
 
@@ -81,9 +76,9 @@ void SqlListModel::updateFilter()
 {
     QStringList filterCmd;
 
-    foreach (const QString &columnName, m_columnDataModels.keys())
+    for (auto column : m_columnDataModels)
     {
-        QString cmd = m_columnDataModels[columnName]->checkedFilterCmd();
+        QString cmd = column->checkedFilterCmd();
         if (!cmd.isEmpty())
             filterCmd << cmd;
     }

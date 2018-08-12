@@ -115,7 +115,7 @@ QModelIndex ListModel::indexFromItem(const ListItem *item) const
         }
     }
 
-    return QModelIndex();
+    return {};
 }
 
 void ListModel::insertItem(ListItem *item, int row)
@@ -140,9 +140,9 @@ void ListModel::insertItem(ListItem *item, int row)
         else
         {
             if (row>=0)
-                m_list.insert(row, 0);
+                m_list.insert(row, Q_NULLPTR);
             else
-                m_list.append(0);
+                m_list.append(Q_NULLPTR);
             qWarning() << "cannot append" << item << "in the model" << this << "(null item added)";
         }
     }
@@ -150,9 +150,9 @@ void ListModel::insertItem(ListItem *item, int row)
     {
         qWarning() << "cannot add null item";
         if (row>=0)
-            m_list.insert(row, 0);
+            m_list.insert(row, Q_NULLPTR);
         else
-            m_list.append(0);
+            m_list.append(Q_NULLPTR);
     }
 }
 

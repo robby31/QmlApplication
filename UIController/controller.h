@@ -15,7 +15,7 @@ class Controller : public QObject
     Q_PROPERTY(QString activity READ activity WRITE setActivity NOTIFY activityChanged)
 
 public:
-    explicit Controller(QObject *parent = 0);
+    explicit Controller(QObject *parent = Q_NULLPTR);
 
     Q_INVOKABLE void abortProcess() {emit abort();}
 
@@ -48,7 +48,7 @@ public slots:
     void activityProgressReceived(const int &progress)          {setActivityProgress(progress); if (!m_busyIndicator) setBusy();}
     void processAborted();
     void errorDuringProcess(const QString &errorMessage)        {popMessage("ERROR: "+errorMessage, UiServices::POP_ERROR);                  setActivityIdle();}
-    void processOver(const QString &message = 0);
+    void processOver(const QString &message = QString());
 
 
 private:

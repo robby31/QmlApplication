@@ -11,9 +11,10 @@ bool CheckedListModel::allChecked()
 
     if (roleNames().contains(roleIndex))
     {
-        for (int row=0; row<m_list.size(); ++row)
+        for (auto item = m_list.constBegin(); item != m_list.constEnd(); ++item)
         {
-            if (!m_list.at(row)->data(roleIndex).toBool())
+            auto checked_item = qobject_cast<CheckedItem*>(*item);
+            if (!checked_item->data(roleIndex).toBool())
                 return false;
         }
     }
@@ -23,11 +24,11 @@ bool CheckedListModel::allChecked()
 
 CheckedItem *CheckedListModel::findByRole(const QVariant &value, const int &role)
 {
-    for (int row=0; row<m_list.size(); ++row)
+    for (auto item = m_list.constBegin(); item != m_list.constEnd(); ++item)
     {
-        auto item = qobject_cast<CheckedItem*>(m_list.at(row));
-        if (item && item->data(role) == value)
-            return item;
+        auto checked_item = qobject_cast<CheckedItem*>(*item);
+        if (checked_item && checked_item->data(role) == value)
+            return checked_item;
     }
 
     return Q_NULLPTR;

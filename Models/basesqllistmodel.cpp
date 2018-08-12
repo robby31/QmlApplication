@@ -68,14 +68,17 @@ QHash<int, QByteArray> BaseSqlListModel::roleNames() const
 
 bool BaseSqlListModel::add_role(const QByteArray &roleName)
 {
-    if (!mRoles.values().contains(roleName))
+    for (const auto& role : mRoles)
     {
-        mRoles.insert(Qt::UserRole+mRoles.size(), roleName);
-        return true;
+        if (role == roleName)
+        {
+            qWarning() << "unable to add role" << roleName << "role already exists.";
+            return false;
+        }
     }
 
-    qWarning() << "unable to add role" << roleName << "role already exists.";
-    return false;
+    mRoles.insert(Qt::UserRole+mRoles.size(), roleName);
+    return true;
 }
 
 void BaseSqlListModel::setQuery(const QString &query)
@@ -130,7 +133,7 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
             if (primaryKeyData.isValid())
             {
                 QSqlQuery query(GET_DATABASE(mconnectionName));
-                query.prepare(QString("UPDATE %2 SET %1=:value WHERE %3=:id").arg(strRole).arg(m_tablename).arg(primaryKey));
+                query.prepare(QString("UPDATE %2 SET %1=:value WHERE %3=:id").arg(strRole, m_tablename, primaryKey));
                 if (strcmp(value.typeName(), "QDateTime") == 0)
                     query.bindValue(":value", QVariant::fromValue(value.toDate()));
                 else
@@ -318,7 +321,7 @@ void BaseSqlListModel::update_query()
     if (filterCmd().isEmpty())
         filteredStringQuery = mStringQuery;
     else
-        filteredStringQuery = QString("SELECT * from (%1) AS filtered_query WHERE %2").arg(mStringQuery).arg(filterCmd());
+        filteredStringQuery = QString("SELECT * from (%1) AS filtered_query WHERE %2").arg(mStringQuery, filterCmd());
 
     if (!m_orderBy.isEmpty())
         filteredStringQuery += QString(" ORDER BY %1").arg(m_orderBy);
@@ -421,7 +424,7 @@ bool BaseSqlListModel::removeRows(int row, int count, const QModelIndex &parent)
         if (primaryKeyData.isValid())
         {
             QSqlQuery query(db);
-            query.prepare(QString("DELETE FROM %1 WHERE %2=:id").arg(m_tablename).arg(primaryKey));
+            query.prepare(QString("DELETE FROM %1 WHERE %2=:id").arg(m_tablename, primaryKey));
             query.bindValue(":id", primaryKeyData);
             if (!query.exec())
             {
@@ -517,7 +520,7 @@ int BaseSqlListModel::append(const QVariantMap &data)
 
     QSqlQuery query(GET_DATABASE(connectionName()));
 
-    QString cmd = QString("INSERT INTO %3 (%1) VALUES(%2)").arg(keys.join(",")).arg(params.join(",")).arg(tablename());
+    QString cmd = QString("INSERT INTO %3 (%1) VALUES(%2)").arg(keys.join(","), params.join(","), tablename());
     query.prepare(cmd);
 
     foreach (QString param, keys)

@@ -9,7 +9,7 @@ class CheckedListModel : public ListModel
     Q_OBJECT
 
 public:
-    explicit CheckedListModel(QObject *parent = 0);
+    explicit CheckedListModel(QObject *parent = Q_NULLPTR);
 
     bool allChecked();
 

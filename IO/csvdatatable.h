@@ -15,8 +15,8 @@ class CsvDataTable : public QObject
 public:
     explicit CsvDataTable(QObject *parent = Q_NULLPTR);
 
-    bool loadFile(const QString &pathname, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
-    bool loadFile(CsvDataTable *input, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
+    bool loadFile(const QString &pathname, QHash<QString, QVariant> *filter=Q_NULLPTR, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
+    bool loadFile(CsvDataTable *input, QHash<QString, QVariant> *filter=Q_NULLPTR, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
 
 signals:
 
@@ -26,20 +26,19 @@ public slots:
     int rowCount() const { return l_data.size(); }
     QList<QStringList> data() const { return l_data; }
     QString titleLine() const { return m_titleLine; }
-    QString getLine(const int &lineNumber) const { if (lineNumber<l_lines.count()) return l_lines.at(lineNumber);
-                                                   else return QString(); }
+    QString getLine(const int &lineNumber) const { if (lineNumber<l_lines.count()) return l_lines.at(lineNumber); return QString(); }
 
     bool isTitleValid(const QString &title) { return l_title.contains(title); }
 
     void setTitle(const QStringList &titles);
-    void appendData(const QStringList &data, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
+    void appendData(const QStringList &data, QHash<QString, QVariant> *filter=Q_NULLPTR, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
 
     QString getValue(const int &index, const QString &param) const;
     QString getValue(const int &index, const int &column) const;
     int searchIndex(const QString &param, const QString &value) const;
 
 private:
-    bool dataFiltered(const QStringList &data, QHash<QString, QVariant> *filter=0, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
+    bool dataFiltered(const QStringList &data, QHash<QString, QVariant> *filter=Q_NULLPTR, QHash<QString, CheckedListModel*> *columnsDataModel=Q_NULLPTR);
 
 private:
     QStringList l_title;

@@ -10,20 +10,20 @@ class ListModel : public AbstractListModel
     Q_OBJECT
 
 public:
-    explicit ListModel(ListItem* prototype, QObject* parent = 0);
-    explicit ListModel(QObject* parent = 0);
-    virtual ~ListModel();
+    explicit ListModel(ListItem* prototype, QObject* parent = Q_NULLPTR);
+    explicit ListModel(QObject* parent = Q_NULLPTR);
+    ~ListModel() Q_DECL_OVERRIDE;
 
-    virtual QHash<int, QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const { Q_UNUSED(parent) return 1; }
-    Q_INVOKABLE bool isEmpty() const {if (isFiltered()) return m_filteredIndex.isEmpty(); else return m_list.isEmpty();}
+    int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE { Q_UNUSED(parent) return 1; }
+    Q_INVOKABLE bool isEmpty() const {if (isFiltered()) return m_filteredIndex.isEmpty(); return m_list.isEmpty();}
 
     Q_INVOKABLE virtual ListItem *at(int row) const;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
 
     Q_INVOKABLE ListItem* find(const QString &id) const;
     Q_INVOKABLE int findRow(const QString &id) const;
@@ -37,9 +37,9 @@ public:
     void appendRows(const QList<ListItem*> &items);
     void insertRow(int row, ListItem* item);
     Q_INVOKABLE bool removeRow(int row, const QModelIndex &parent = QModelIndex());
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) Q_DECL_OVERRIDE;
 
-    virtual bool isFiltered() const { return m_isFiltered; }
+    bool isFiltered() const Q_DECL_OVERRIDE { return m_isFiltered; }
     Q_INVOKABLE void filterRole(const QString &text, const QString &role) { emit filterRoleSignal(text, role); }
 
 private:
@@ -53,7 +53,7 @@ signals:
 private slots:
     void itemDataChanged(QVector<int> roles);
 
-    void setFilter(QList<int> l_index) { beginResetModel(); m_filteredIndex = l_index; setFlagFiltered(true);  endResetModel(); }
+    void setFilter(const QList<int>& l_index) { beginResetModel(); m_filteredIndex = l_index; setFlagFiltered(true);  endResetModel(); }
     void filterRoleSlot(const QString &text, const QString &role);
     void clearFilter();
 

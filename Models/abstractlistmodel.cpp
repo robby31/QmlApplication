@@ -39,8 +39,8 @@ QVariantMap AbstractListModel::get(const int &index)
     if (index >=0 && index < rowCount())
     {
         QHash<int, QByteArray> roles = roleNames();
-        foreach (int role, roles.keys())
-            res[roles[role]] = data(indexFromRow(index), role);
+        for (auto role = roles.constBegin(); role != roles.constEnd(); ++role)
+            res[role.value()] = data(indexFromRow(index), role.key());
     }
 
     return res;
@@ -51,7 +51,7 @@ QVariant AbstractListModel::get(int i, const QString &role) const
     return dataByStringRole(indexFromRow(i), role);
 }
 
-QModelIndex AbstractListModel::indexFromRow(const int row) const
+QModelIndex AbstractListModel::indexFromRow(const int &row) const
 {
     return index(row, 0);
 }
@@ -72,7 +72,7 @@ int AbstractListModel::findRow(const QVariant &value, const QString &role) const
     return -1;
 }
 
-bool AbstractListModel::setDataByStringRole(const int row, const QVariant &value, const QString &role)
+bool AbstractListModel::setDataByStringRole(const int& row, const QVariant &value, const QString &role)
 {
     return setDataByStringRole(indexFromRow(row), value, role);
 }
