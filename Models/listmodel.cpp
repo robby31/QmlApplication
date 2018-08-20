@@ -21,7 +21,8 @@ ListModel::ListModel(QObject *parent) :
 
 ListModel::~ListModel()
 {
-    clear();
+    m_filteredIndex.clear();
+    qDeleteAll(m_list);
     delete m_prototype;
 }
 
