@@ -143,7 +143,7 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
                 {
                     if (mSqlQuery.exec() && mSqlQuery.seek(index.row()))
                     {
-                        if (mSqlQuery.record().value(primaryKey).isNull() or mSqlQuery.record().value(primaryKey).toInt() != mRecords[index.row()].value(primaryKey).toInt())
+                        if (mSqlQuery.record().value(primaryKey).isNull() || mSqlQuery.record().value(primaryKey).toInt() != mRecords[index.row()].value(primaryKey).toInt())
                             qCritical() << "setData unable to update data" << primaryKey << mSqlQuery.record().value(primaryKey).toInt() << mRecords[index.row()].value(primaryKey).toInt();
                         else
                             mRecords[index.row()] = mSqlQuery.record();

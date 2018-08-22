@@ -135,7 +135,7 @@ QString CheckedSqlListModel::checkedFilterCmd()
             filteredString << QString("\"%1\"").arg(name);
     }
 
-    if (m_allChecked  && (!filteredString.isEmpty() or filteredStringNull))
+    if (m_allChecked  && (!filteredString.isEmpty() || filteredStringNull))
     {
         if (!filteredString.isEmpty())
         {
@@ -148,7 +148,7 @@ QString CheckedSqlListModel::checkedFilterCmd()
         if (filteredStringNull)
             return QString("%1 is not null").arg(strRole);
     }
-    else if (!m_allChecked && (!filteredString.isEmpty() or filteredStringNull))
+    else if (!m_allChecked && (!filteredString.isEmpty() || filteredStringNull))
     {
         if (!filteredString.isEmpty())
         {
