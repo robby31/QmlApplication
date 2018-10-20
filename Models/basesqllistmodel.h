@@ -17,6 +17,7 @@ class BaseSqlListModel : public AbstractListModel
     Q_PROPERTY (QString tablename READ tablename WRITE setTablename NOTIFY tablenameChanged)
     Q_PROPERTY (QString lastError READ lastError NOTIFY lastErrorChanged)
     Q_PROPERTY (QString orderBy READ orderBy WRITE setOrderBy NOTIFY orderByChanged)
+    Q_PROPERTY (QString filteringQuery READ filteringQuery WRITE setFilteringQuery NOTIFY filteringQueryChanged)
 
     typedef struct {
         QModelIndex topLeft;
@@ -48,6 +49,7 @@ public:
     QString query();
     QString tablename();
     QString lastError();
+    QString primaryKeyTable(const QString &tableName);
 
     // set connection name
     void setConnectionName(const QString &name);
@@ -63,6 +65,9 @@ public:
     QString orderBy() const;
     void setOrderBy(const QString &cmd);
 
+    QString filteringQuery() const;
+    void setFilteringQuery(const QString &query);
+
 private:
     bool add_role(const QByteArray &roleName);
 
@@ -74,6 +79,7 @@ signals:
     void tablenameChanged();
     void lastErrorChanged();
     void orderByChanged();
+    void filteringQueryChanged();
 
 public slots:
     void resetModel();
@@ -97,6 +103,8 @@ private:
     QList<QByteArray> m_customRoles;
     QHash<QString, QHash<QString, QHash<QString, QString> > > m_foreignKeys;
     QString m_orderBy;
+    QString m_filteringQuery;
+    QHash<QString, QString> m_primaryKey;
 };
 
 #endif // BASESQLLISTMODEL_H

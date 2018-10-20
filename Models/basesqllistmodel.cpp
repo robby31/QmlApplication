@@ -8,6 +8,7 @@ BaseSqlListModel::BaseSqlListModel(QObject *parent) :
     m_filtercmd()
 {
     connect(this, SIGNAL(isFilteredChanged()), this, SLOT(update_query()));
+    connect(this, SIGNAL(filteringQueryChanged()), this, SLOT(update_query()));
 }
 
 int BaseSqlListModel::rowCount(const QModelIndex &parent) const
@@ -116,17 +117,13 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
     QString strRole = QVariant::fromValue(mRoles[role]).toString();
     if (!m_tablename.isEmpty() && index.row() >= 0 && index.row() < mRecords.count())
     {
-        QSqlDatabase db = GET_DATABASE(mconnectionName);
-
-        QSqlIndex primaryIndex = db.primaryIndex(m_tablename);
-        if (primaryIndex.count() == 0)
+        QString primaryKey = primaryKeyTable(m_tablename);
+        if (primaryKey.isEmpty())
         {
             qCritical() << "setData unable to find primary index for table" << m_tablename;
         }
         else
         {
-            QString primaryKey = primaryIndex.fieldName(0);
-
             QSqlRecord record = mRecords.at(index.row());
 
             QVariant primaryKeyData = record.value(primaryKey);
@@ -134,14 +131,14 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
             {
                 QSqlQuery query(GET_DATABASE(mconnectionName));
                 query.prepare(QString("UPDATE %2 SET %1=:value WHERE %3=:id").arg(strRole, m_tablename, primaryKey));
-                if (strcmp(value.typeName(), "QDateTime") == 0)
+                if (value.isValid() && strcmp(value.typeName(), "QDateTime") == 0)
                     query.bindValue(":value", QVariant::fromValue(value.toDate()));
                 else
                     query.bindValue(":value", value);
                 query.bindValue(":id", primaryKeyData);
                 if (query.exec())
                 {
-                    if (mSqlQuery.exec() && mSqlQuery.seek(index.row()))
+                    if (mSqlQuery.exec(mSqlQuery.lastQuery()) && mSqlQuery.seek(index.row()))
                     {
                         if (mSqlQuery.record().value(primaryKey).isNull() || mSqlQuery.record().value(primaryKey).toInt() != mRecords[index.row()].value(primaryKey).toInt())
                             qCritical() << "setData unable to update data" << primaryKey << mSqlQuery.record().value(primaryKey).toInt() << mRecords[index.row()].value(primaryKey).toInt();
@@ -149,6 +146,8 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
                             mRecords[index.row()] = mSqlQuery.record();
 
                         emit dataChanged(index, index, roles);
+
+                        mSqlQuery.finish();
 
                         return true;
                     }
@@ -175,7 +174,7 @@ bool BaseSqlListModel::setData(const QModelIndex &index, const QVariant &value, 
 
 void BaseSqlListModel::resetModel()
 {
-    setQuery(mSqlQuery.lastQuery());
+    setQuery(mStringQuery);
 }
 
 void BaseSqlListModel::reload()
@@ -319,11 +318,18 @@ void BaseSqlListModel::update_query()
 
     QString filteredStringQuery;
     if (filterCmd().isEmpty())
+    {
         filteredStringQuery = mStringQuery;
+    }
     else
-        filteredStringQuery = QString("SELECT * from (%1) AS filtered_query WHERE %2").arg(mStringQuery, filterCmd());
+    {
+        if (m_filteringQuery.isEmpty())
+            filteredStringQuery = QString("SELECT * from (%1) AS filtered_query WHERE %2").arg(mStringQuery, filterCmd());
+        else
+            filteredStringQuery = QString(m_filteringQuery).arg(QString("WHERE %1").arg(filterCmd()));
+    }
 
-    if (!m_orderBy.isEmpty())
+    if (!m_orderBy.isEmpty() && !filteredStringQuery.isEmpty())
         filteredStringQuery += QString(" ORDER BY %1").arg(m_orderBy);
 
     beginResetModel();
@@ -407,15 +413,13 @@ bool BaseSqlListModel::removeRows(int row, int count, const QModelIndex &parent)
         return false;
     }
 
-    QSqlIndex primaryIndex = db.primaryIndex(m_tablename);
-    if (primaryIndex.count() == 0)
+    QString primaryKey = primaryKeyTable(m_tablename);
+    if (primaryKey.isEmpty())
     {
         qCritical() << "unable to find primary index for table" << m_tablename;
         db.rollback();
         return false;
     }
-
-    QString primaryKey = primaryIndex.fieldName(0);
 
     for (int i=0;i<count;++i)
     {
@@ -544,4 +548,34 @@ void BaseSqlListModel::setOrderBy(const QString &cmd)
 {
     m_orderBy = cmd;
     emit orderByChanged();
+}
+
+QString BaseSqlListModel::filteringQuery() const
+{
+    return m_filteringQuery;
+}
+
+void BaseSqlListModel::setFilteringQuery(const QString &query)
+{
+    m_filteringQuery = query;
+    emit filteringQueryChanged();
+}
+
+QString BaseSqlListModel::primaryKeyTable(const QString &tableName)
+{
+    QSqlDatabase db = GET_DATABASE(mconnectionName);
+
+    if (!m_primaryKey.contains(tableName))
+    {
+        QSqlIndex primaryIndex = db.primaryIndex(tableName);
+        if (primaryIndex.count() == 0)
+        {
+            qCritical() << "unable to find primary index for table" << m_tablename;
+            return QString();
+        }
+
+        m_primaryKey[tableName] = primaryIndex.fieldName(0);
+    }
+
+    return m_primaryKey[tableName];
 }

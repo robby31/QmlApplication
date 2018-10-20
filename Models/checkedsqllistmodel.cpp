@@ -19,10 +19,14 @@ void CheckedSqlListModel::init_query()
 {
     if (!m_queryData.isEmpty() && !m_parameter.isEmpty())
         setQuery(QString("SELECT DISTINCT %2 from (%1) AS checked_query").arg(m_queryData, m_parameter));
-    else if (!tablename().isEmpty() && !m_parameter.isEmpty())
-        setQuery(QString("SELECT DISTINCT %2 from %1").arg(tablename(), m_parameter));
-    else
-        setQuery(QString());
+
+    if (!lastError().trimmed().isEmpty())
+    {
+        if (!tablename().isEmpty() && !m_parameter.isEmpty())
+            setQuery(QString("SELECT DISTINCT %2 from %1").arg(tablename(), m_parameter));
+        else
+            setQuery(QString());
+    }
 }
 
 QVariant CheckedSqlListModel::data(const QModelIndex &index, int role) const
