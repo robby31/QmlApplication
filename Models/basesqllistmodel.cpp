@@ -179,6 +179,12 @@ void BaseSqlListModel::resetModel()
 
 void BaseSqlListModel::reload()
 {
+    if (roleNames().size() == 0)
+    {
+        resetModel();
+        return;
+    }
+
     QString lastQuery = mSqlQuery.lastQuery();
     if (!lastQuery.isEmpty())
     {
@@ -192,7 +198,6 @@ void BaseSqlListModel::reload()
         int oldSize = mRecords.size();
         QList<T_DATACHANGED> l_dataToUpdate;
 
-        qDebug() << "RELOAD" << lastQuery;
         if (mSqlQuery.exec(lastQuery))
         {
             execQueryPerfo = timer.elapsed();
