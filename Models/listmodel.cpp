@@ -250,20 +250,23 @@ void ListModel::itemDataChanged(QVector<int> roles)
         int maxRole = *min_max.second;
 
         QModelIndex topLeftIndex = indexFromItem(item);
-        QModelIndex bottomRightIndex = topLeftIndex;
+        if (topLeftIndex.isValid())
+        {
+            QModelIndex bottomRightIndex = topLeftIndex;
 
-        if (minRole > Qt::UserRole)
-            topLeftIndex = index(topLeftIndex.row(), minRole-Qt::UserRole-1);
-        if (maxRole > Qt::UserRole)
-            bottomRightIndex = index(bottomRightIndex.row(), maxRole-Qt::UserRole-1);
+            if (minRole > Qt::UserRole)
+                topLeftIndex = index(topLeftIndex.row(), minRole-Qt::UserRole-1);
+            if (maxRole > Qt::UserRole)
+                bottomRightIndex = index(bottomRightIndex.row(), maxRole-Qt::UserRole-1);
 
-        if (!roles.isEmpty())
-            roles << Qt::DisplayRole;
+            if (!roles.isEmpty())
+                roles << Qt::DisplayRole;
 
-        if (topLeftIndex.isValid() && bottomRightIndex.isValid())
-            emit dataChanged(topLeftIndex, bottomRightIndex, roles);
-        else
-            qCritical() << "invalid index" << topLeftIndex << bottomRightIndex;
+            if (topLeftIndex.isValid() && bottomRightIndex.isValid())
+                emit dataChanged(topLeftIndex, bottomRightIndex, roles);
+            else
+                qCritical() << "invalid index" << topLeftIndex << bottomRightIndex << "in item data changed" << roles;
+        }
     }
 }
 
