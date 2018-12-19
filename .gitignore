@@ -2,3 +2,4 @@
 .DS_Store
 
 QmlApplication.pro.user
+*.8-pre1
