@@ -9,7 +9,7 @@ TEMPLATE = lib
 TARGET = QmlApplication
 TARGET = $$qtLibraryTarget($$TARGET)
 
-QT       += qml quick widgets sql
+QT       += qml quick widgets sql charts
 QT       -= gui
 
 qtHaveModule(webview) {
@@ -57,7 +57,9 @@ SOURCES +=  \
     Models/tablemodel.cpp \
     Worker/myrunnable.cpp \
     Models/pivotmodel.cpp \
-    Worker/databaseworker.cpp
+    Worker/databaseworker.cpp \
+    SqlModel/myvxymodelmapper.cpp \
+    SqlModel/sqlquerymodel.cpp
 
 
 HEADERS +=  \
@@ -81,7 +83,9 @@ HEADERS +=  \
     mysqldatabase.h \
     Worker/myrunnable.h \
     Models/pivotmodel.h \
-    Worker/databaseworker.h
+    Worker/databaseworker.h \
+    SqlModel/myvxymodelmapper.h \
+    SqlModel/sqlquerymodel.h
 
 
 installPath = $$(MYLIBRARY)/$$QT_VERSION
@@ -122,6 +126,10 @@ INSTALLS += io
 models.files = Models/*.h
 models.path = $$installIncludePath/Models
 INSTALLS += models
+
+sql_models.files = SqlModel/*.h
+sql_models.path = $$installIncludePath/SqlModel
+INSTALLS += sql_models
 
 uicontroller.files = UIController/*.h
 uicontroller.path = $$installIncludePath/UIController
