@@ -10,14 +10,17 @@ class MyVXYModelMapper : public QVXYModelMapper
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractAxis *axisX READ axisX NOTIFY axisXChanged)
-    Q_PROPERTY(QAbstractAxis *axisY READ axisY NOTIFY axisYChanged)
+    Q_PROPERTY(QAbstractAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
+    Q_PROPERTY(QAbstractAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
 
 public:
     explicit MyVXYModelMapper(QObject *parent = Q_NULLPTR);
 
     QAbstractAxis *axisX() const;
+    bool setAxisX(QAbstractAxis *axis);
+
     QAbstractAxis *axisY() const;
+    bool setAxisY(QAbstractAxis *axis);
 
 private:
     void initAxes();

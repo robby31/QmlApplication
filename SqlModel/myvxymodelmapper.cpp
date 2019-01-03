@@ -34,6 +34,8 @@ void MyVXYModelMapper::_modelReplaced()
 
 void MyVXYModelMapper::_modelReset()
 {
+    qDebug() << "model reset" << m_model;
+
     m_rowCountAnalysed = -1;
     m_xMin.clear();
     m_xMax.clear();
@@ -45,6 +47,8 @@ void MyVXYModelMapper::_modelReset()
 
 void MyVXYModelMapper::_xColumnChanged()
 {
+    qDebug() << "x column changed" << xColumn();
+
     m_rowCountAnalysed = -1;
     m_xMin.clear();
     m_xMax.clear();
@@ -54,6 +58,8 @@ void MyVXYModelMapper::_xColumnChanged()
 
 void MyVXYModelMapper::_yColumnChanged()
 {
+    qDebug() << "y column changed" << yColumn();
+
     m_rowCountAnalysed = -1;
     m_yMin.clear();
     m_yMax.clear();
@@ -103,14 +109,39 @@ void MyVXYModelMapper::_analyseData()
 
     qDebug() << "define x min max from data" << m_xMin << m_xMax;
     if (m_xAxis)
+    {
+        if (m_xAxis->type() == QtCharts::QAbstractAxis::AxisTypeValue)
+        {
+            if (m_xMin == m_xMax)
+            {
+                m_xMin = QVariant::fromValue(m_xMin.toInt() - 1);
+                m_xMax = QVariant::fromValue(m_xMax.toInt() + 1);
+            }
+        }
+
         m_xAxis->setRange(m_xMin, m_xMax);
+
+        if (m_xMin.type() == QVariant::Int or m_xMin.type() == QVariant::LongLong)
+        {
+            auto tmpAxis = qobject_cast<QValueAxis*>(m_xAxis);
+            tmpAxis->setTickCount(m_xMax.toInt()-m_xMin.toInt()+1);
+        }
+    }
 
     qDebug() << "define y min max from data" << m_yMin << m_yMax;
     if (m_yAxis)
     {
+        if (m_yAxis->type() == QtCharts::QAbstractAxis::AxisTypeValue)
+        {
+            if (m_yMin>0)
+                m_yMin = 0;
+            if (m_yMax<0)
+                m_yMax = 0;
+        }
+
         m_yAxis->setRange(m_yMin, m_yMax);
 
-        QValueAxis *tmpAxis = qobject_cast<QValueAxis*>(m_yAxis);
+        auto tmpAxis = qobject_cast<QValueAxis*>(m_yAxis);
         if (tmpAxis)
         {
             qDebug() << "apply nice numbers";
@@ -137,22 +168,45 @@ void MyVXYModelMapper::initAxes()
         {
             QVariant xValue = m_model->data(m_model->index(0, xColumn()));
             qDebug() << "init AXES" << xValue << "type" << xValue.type();
+            auto axis = getAxisFromType(xValue.type());
+            if (!setAxisX(axis))
+                delete axis;
+
             if (m_xAxis)
-                m_xAxis->deleteLater();
-            m_xAxis = getAxisFromType(xValue.type());
-            m_xAxis->setTitleText(m_model->headerData(xColumn(), Qt::Horizontal).toString());
-            emit axisXChanged();
+            {
+                m_xAxis->setTitleText(m_model->headerData(xColumn(), Qt::Horizontal).toString());
+
+                QFont font(m_xAxis->titleFont());
+                font.setCapitalization(QFont::Capitalize);
+                m_xAxis->setTitleFont(font);
+
+                if (m_xAxis->type() == QtCharts::QAbstractAxis::AxisTypeValue)
+                {
+                    auto tmpAxis = qobject_cast<QValueAxis*>(m_xAxis);
+                    if (xValue.type() == QVariant::Int or xValue.type() == QVariant::LongLong)
+                    {
+                        tmpAxis->setLabelFormat("%d");
+                    }
+                }
+            }
         }
 
         if (yColumn()>=0)
         {
             QVariant yValue = m_model->data(m_model->index(0, yColumn()));
             qDebug() << "init AXES" << yValue << "type" << yValue.type();
+            auto axis = getAxisFromType(yValue.type());
+            if (!setAxisY(axis))
+                delete axis;
+
             if (m_yAxis)
-                m_yAxis->deleteLater();
-            m_yAxis = getAxisFromType(yValue.type());
-            m_yAxis->setTitleText(m_model->headerData(yColumn(), Qt::Horizontal).toString());
-            emit axisYChanged();
+            {
+                m_yAxis->setTitleText(m_model->headerData(yColumn(), Qt::Horizontal).toString());
+
+                QFont font(m_yAxis->titleFont());
+                font.setCapitalization(QFont::Capitalize);
+                m_yAxis->setTitleFont(font);
+            }
         }
     }
 }
@@ -163,7 +217,7 @@ QAbstractAxis *MyVXYModelMapper::getAxisFromType(const QVariant::Type &type)
 
     if (type == QVariant::DateTime)
     {
-        QDateTimeAxis *tmp = new QDateTimeAxis(this);
+        auto tmp = new QDateTimeAxis(this);
         tmp->setFormat("MM yyyy");
         axis = tmp;
     }
@@ -173,4 +227,36 @@ QAbstractAxis *MyVXYModelMapper::getAxisFromType(const QVariant::Type &type)
     }
 
     return axis;
+}
+
+bool MyVXYModelMapper::setAxisX(QAbstractAxis *axis)
+{
+    qDebug() << "set Axis X" << axis;
+
+    if (!m_xAxis or m_xAxis->type() != axis->type())
+    {
+        if (m_xAxis)
+            m_xAxis->deleteLater();
+        m_xAxis = axis;
+        emit axisXChanged();
+        return true;
+    }
+
+    return false;
+}
+
+bool MyVXYModelMapper::setAxisY(QAbstractAxis *axis)
+{
+    qDebug() << "set Axis Y" << axis;
+
+    if (!m_yAxis or m_yAxis->type() != axis->type())
+    {
+        if (m_yAxis)
+            m_yAxis->deleteLater();
+        m_yAxis = axis;
+        emit axisYChanged();
+        return true;
+    }
+
+    return false;
 }
