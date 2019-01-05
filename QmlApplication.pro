@@ -59,7 +59,8 @@ SOURCES +=  \
     Models/pivotmodel.cpp \
     Worker/databaseworker.cpp \
     SqlModel/myvxymodelmapper.cpp \
-    SqlModel/sqlquerymodel.cpp
+    SqlModel/sqlquerymodel.cpp \
+    SqlModel/sqltablemodel.cpp
 
 
 HEADERS +=  \
@@ -85,7 +86,8 @@ HEADERS +=  \
     Models/pivotmodel.h \
     Worker/databaseworker.h \
     SqlModel/myvxymodelmapper.h \
-    SqlModel/sqlquerymodel.h
+    SqlModel/sqlquerymodel.h \
+    SqlModel/sqltablemodel.h
 
 
 installPath = $$(MYLIBRARY)/$$QT_VERSION
