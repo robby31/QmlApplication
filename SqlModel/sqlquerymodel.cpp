@@ -135,3 +135,8 @@ void SqlQueryModel::_updateCurrentQuery()
             clear();
     }
 }
+
+void SqlQueryModel::reload()
+{
+    _updateCurrentQuery();
+}

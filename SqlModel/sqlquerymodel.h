@@ -29,10 +29,10 @@ public:
     int _columnCount() const;
 
     QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
-    virtual QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
 protected:
-    virtual void queryChange() Q_DECL_OVERRIDE;
+    void queryChange() Q_DECL_OVERRIDE;
 
 private:
     void _initRoles();
@@ -42,6 +42,9 @@ signals:
     void queryChanged();
     void rowCountChanged();
     void columnCountChanged();
+
+public slots:
+    void reload();
 
 private slots:
     void _updateCurrentQuery();
