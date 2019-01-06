@@ -45,7 +45,7 @@ signals:
 public slots:
     void reload();
 
-    void remove(const int &index, const int &count = 1);
+    bool remove(const int &index, const int &count = 1);
 
 private slots:
     void _updateCurrentQuery();

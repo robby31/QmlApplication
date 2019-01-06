@@ -159,14 +159,30 @@ void SqlTableModel::reload()
     _updateCurrentQuery();
 }
 
-void SqlTableModel::remove(const int &index, const int &count)
+bool SqlTableModel::remove(const int &index, const int &count)
 {
+    if (tableName().isEmpty())
+    {
+        qCritical() << "table name is empty, cannot remove row";
+        return false;
+    }
+
     QString tmpQuery = _query();
 
-    removeRows(index, count);
+    if (!removeRows(index, count))
+    {
+        qCritical() << "cannot remove row" << index << count;
+        return false;
+    }
 
-    submitAll();
+    if (!submitAll())
+    {
+        qCritical() << "cannot submit changes" << lastError();
+        return false;
+    }
 
     if (tmpQuery != _query())
         _setQuery(tmpQuery);
+
+    return true;
 }
