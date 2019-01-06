@@ -20,7 +20,7 @@ int BaseSqlListModel::rowCount(const QModelIndex &parent) const
 int BaseSqlListModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    return mRoles.size();
+    return mRoles.size() - 1;
 }
 
 QVariant BaseSqlListModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -340,6 +340,8 @@ void BaseSqlListModel::update_query()
     beginResetModel();
     mRoles.clear();
     mRecords.clear();
+
+    mRoles[Qt::DisplayRole] = "display";
 
     qint64 execQueryPerfo = -1;
     if (mSqlQuery.driver()->isOpen() && !filteredStringQuery.isEmpty())
