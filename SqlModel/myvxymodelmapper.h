@@ -33,9 +33,10 @@ signals:
 private slots:
     void _modelReplaced();
     void _modelReset();
+    void _insertedRow(const QModelIndex &parent, int first, int last);
     void _xColumnChanged();
     void _yColumnChanged();
-    void _analyseData();
+    void _analyseData(const int &startRow = -1, const int &endRow = -1);
 
 private:
     QAbstractAxis *m_xAxis = Q_NULLPTR;

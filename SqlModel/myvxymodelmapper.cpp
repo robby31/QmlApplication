@@ -6,7 +6,6 @@ MyVXYModelMapper::MyVXYModelMapper(QObject *parent):
     connect(this, &MyVXYModelMapper::modelReplaced, this, &MyVXYModelMapper::_modelReplaced);
     connect(this, &MyVXYModelMapper::xColumnChanged, this, &MyVXYModelMapper::_xColumnChanged);
     connect(this, &MyVXYModelMapper::yColumnChanged, this, &MyVXYModelMapper::_yColumnChanged);
-    connect(this, &MyVXYModelMapper::rowCountChanged, this, &MyVXYModelMapper::_analyseData);
 }
 
 void MyVXYModelMapper::_modelReplaced()
@@ -29,7 +28,15 @@ void MyVXYModelMapper::_modelReplaced()
     if (m_model)
     {
         connect(m_model, &QAbstractItemModel::modelReset, this, &MyVXYModelMapper::_modelReset);
+        connect(m_model, &QAbstractItemModel::rowsInserted, this, &MyVXYModelMapper::_insertedRow);
     }
+}
+
+void MyVXYModelMapper::_insertedRow(const QModelIndex &parent, int first, int last)
+{
+    qWarning() << "row inserted" << parent << first << last;
+
+    _analyseData(first, last);
 }
 
 void MyVXYModelMapper::_modelReset()
@@ -67,7 +74,7 @@ void MyVXYModelMapper::_yColumnChanged()
     _analyseData();
 }
 
-void MyVXYModelMapper::_analyseData()
+void MyVXYModelMapper::_analyseData(const int &startRow, const int &endRow)
 {
     if (m_rowCountAnalysed != -1 && rowCount() <= m_rowCountAnalysed)
     {
@@ -81,13 +88,19 @@ void MyVXYModelMapper::_analyseData()
         return;
     }
 
-    qDebug() << m_rowCountAnalysed << "analyse data, model size" << rowCount();
-
     int init_row = 0;
-    if (m_rowCountAnalysed > 0)
+    if (startRow != -1)
+        init_row = startRow;
+    else if (m_rowCountAnalysed > 0)
         init_row = m_rowCountAnalysed;
 
-    for (int row = init_row;row<rowCount();++row)
+    int end_row = rowCount() - 1;
+    if (endRow != -1)
+        end_row = endRow;
+
+    qDebug() << m_rowCountAnalysed << "analyse data, model size" << rowCount() << "start row" << init_row << "end row" << end_row;
+
+    for (int row = init_row;row<=end_row;++row)
     {
         QVariant xValue = m_model->data(m_model->index(row, xColumn()));
         QVariant yValue = m_model->data(m_model->index(row, yColumn()));
