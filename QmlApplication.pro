@@ -87,7 +87,8 @@ HEADERS +=  \
     Worker/databaseworker.h \
     SqlModel/myvxymodelmapper.h \
     SqlModel/sqlquerymodel.h \
-    SqlModel/sqltablemodel.h
+    SqlModel/sqltablemodel.h \
+    mynetwork.h
 
 
 installPath = $$(MYLIBRARY)/$$QT_VERSION
