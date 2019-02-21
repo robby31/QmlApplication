@@ -246,7 +246,7 @@ bool MyVXYModelMapper::setAxisX(QAbstractAxis *axis)
 {
     qDebug() << "set Axis X" << axis;
 
-    if (!m_xAxis or m_xAxis->type() != axis->type())
+    if (!m_xAxis || m_xAxis->type() != axis->type())
     {
         if (m_xAxis)
             m_xAxis->deleteLater();
@@ -262,7 +262,7 @@ bool MyVXYModelMapper::setAxisY(QAbstractAxis *axis)
 {
     qDebug() << "set Axis Y" << axis;
 
-    if (!m_yAxis or m_yAxis->type() != axis->type())
+    if (!m_yAxis || m_yAxis->type() != axis->type())
     {
         if (m_yAxis)
             m_yAxis->deleteLater();
