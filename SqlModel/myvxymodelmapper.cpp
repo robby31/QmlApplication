@@ -134,7 +134,7 @@ void MyVXYModelMapper::_analyseData(const int &startRow, const int &endRow)
 
         m_xAxis->setRange(m_xMin, m_xMax);
 
-        if (m_xMin.type() == QVariant::Int or m_xMin.type() == QVariant::LongLong)
+        if (m_xMin.type() == QVariant::Int || m_xMin.type() == QVariant::LongLong)
         {
             auto tmpAxis = qobject_cast<QValueAxis*>(m_xAxis);
             tmpAxis->setTickCount(m_xMax.toInt()-m_xMin.toInt()+1);
@@ -196,7 +196,7 @@ void MyVXYModelMapper::initAxes()
                 if (m_xAxis->type() == QtCharts::QAbstractAxis::AxisTypeValue)
                 {
                     auto tmpAxis = qobject_cast<QValueAxis*>(m_xAxis);
-                    if (xValue.type() == QVariant::Int or xValue.type() == QVariant::LongLong)
+                    if (xValue.type() == QVariant::Int || xValue.type() == QVariant::LongLong)
                     {
                         tmpAxis->setLabelFormat("%d");
                     }
