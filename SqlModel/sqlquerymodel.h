@@ -46,6 +46,8 @@ signals:
 public slots:
     void reload();
 
+     QVariantMap get(const int &index);
+
 private slots:
     void _updateCurrentQuery();
 

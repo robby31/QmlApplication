@@ -140,3 +140,17 @@ void SqlQueryModel::reload()
 {
     _updateCurrentQuery();
 }
+
+QVariantMap SqlQueryModel::get(const int &index)
+{
+    QVariantMap res;
+
+    if (index >=0 && index < rowCount())
+    {
+        QSqlRecord data = record(index);
+        for (int i=0;i<data.count();++i)
+            res[data.fieldName(i)] = data.value(i);
+    }
+
+    return res;
+}
