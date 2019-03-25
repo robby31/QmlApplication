@@ -3,8 +3,6 @@
 SqlTableModel::SqlTableModel(QObject *parent):
     QSqlTableModel(parent)
 {
-    connect(this, &SqlTableModel::connectionNameChanged, this, &SqlTableModel::_updateCurrentQuery);
-
     connect(this, &SqlTableModel::modelReset, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsInserted, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsRemoved, this, &SqlTableModel::rowCountChanged);
@@ -13,14 +11,12 @@ SqlTableModel::SqlTableModel(QObject *parent):
     connect(this, &SqlTableModel::columnsInserted, this, &SqlTableModel::columnCountChanged);
     connect(this, &SqlTableModel::columnsRemoved, this, &SqlTableModel::columnCountChanged);
 
-    setEditStrategy(QSqlTableModel::OnManualSubmit);
+    connect(this, &SqlTableModel::dataChanged, this, &SqlTableModel::dataUpdated);
 }
 
 SqlTableModel::SqlTableModel(const QString &connectionName, QObject *parent):
     QSqlTableModel (parent, GET_DATABASE(connectionName))
 {
-    connect(this, &SqlTableModel::connectionNameChanged, this, &SqlTableModel::_updateCurrentQuery);
-
     connect(this, &SqlTableModel::modelReset, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsInserted, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsRemoved, this, &SqlTableModel::rowCountChanged);
@@ -29,18 +25,7 @@ SqlTableModel::SqlTableModel(const QString &connectionName, QObject *parent):
     connect(this, &SqlTableModel::columnsInserted, this, &SqlTableModel::columnCountChanged);
     connect(this, &SqlTableModel::columnsRemoved, this, &SqlTableModel::columnCountChanged);
 
-    setEditStrategy(QSqlTableModel::OnManualSubmit);
-}
-
-QString SqlTableModel::connectionName() const
-{
-    return m_connectionName;
-}
-
-void SqlTableModel::setConnectionName(const QString &name)
-{
-    m_connectionName = name;
-    emit connectionNameChanged();
+    connect(this, &SqlTableModel::dataChanged, this, &SqlTableModel::dataUpdated);
 }
 
 QString SqlTableModel::_query() const
@@ -77,86 +62,28 @@ QHash<int, QByteArray> SqlTableModel::roleNames() const
 
 QVariant SqlTableModel::data(const QModelIndex &item, int role) const
 {
-    if (item.column()==0 && role>=Qt::UserRole)
+//    qWarning() << "DATA" << item << role;
+
+    if (role >= Qt::UserRole && (role - Qt::UserRole) < columnCount())
     {
+//        qWarning() << rowCount() << "custom data" << index(item.row(), role-Qt::UserRole, item.parent()) << Qt::DisplayRole << QSqlTableModel::data(index(item.row(), role-Qt::UserRole, item.parent()), Qt::DisplayRole);
         return QSqlTableModel::data(index(item.row(), role-Qt::UserRole, item.parent()), Qt::DisplayRole);
     }
 
+//    qWarning() << rowCount() << "data" << item << role << QSqlTableModel::data(item, role);
     return QSqlTableModel::data(item, role);
 }
 
 void SqlTableModel::queryChange()
 {
-    QSqlDatabase db = GET_DATABASE(m_connectionName);
-
-    if (!lastError().isValid())
-    {
-        _initRoles();
-
-        if (!db.driver()->hasFeature(QSqlDriver::QuerySize))
-        {
-            // fetch all data
-            while (canFetchMore())
-                fetchMore();
-        }
-    }
+    _initRoles();
 
     emit queryChanged();
 }
 
 void SqlTableModel::_setQuery(const QString &cmd)
 {
-    if (m_connectionName.isEmpty())
-    {
-        qDebug() << "invalid connection name";
-
-        // store sql request to execute when connection name will be available
-        m_tmpQuery = cmd;
-
-        return;
-    }
-
-    QSqlDatabase db = GET_DATABASE(m_connectionName);
-    if (!db.isValid() || !db.isOpen())
-    {
-        qCritical() << "invalid database" << m_connectionName;
-
-        // store sql request to execute when connection name will be ready
-        m_tmpQuery = cmd;
-
-        return;
-    }
-
-    QSqlQueryModel::setQuery(cmd, db);
-}
-
-void SqlTableModel::_updateCurrentQuery()
-{
-    if (m_connectionName.isEmpty())
-    {
-        clear();
-        return;
-    }
-
-    if (!m_tmpQuery.isEmpty())
-    {
-        QString cmd = m_tmpQuery;
-        m_tmpQuery.clear();
-        _setQuery(cmd);
-    }
-    else
-    {
-        QString tmpQuery = query().executedQuery();
-        if (!tmpQuery.isEmpty())
-            _setQuery(tmpQuery);
-        else
-            clear();
-    }
-}
-
-void SqlTableModel::reload()
-{
-    _updateCurrentQuery();
+    m_customQuery = cmd;
 }
 
 bool SqlTableModel::remove(const int &index, const int &count)
@@ -166,8 +93,6 @@ bool SqlTableModel::remove(const int &index, const int &count)
         qCritical() << "table name is empty, cannot remove row";
         return false;
     }
-
-    QString tmpQuery = _query();
 
     if (!removeRows(index, count))
     {
@@ -181,8 +106,78 @@ bool SqlTableModel::remove(const int &index, const int &count)
         return false;
     }
 
-    if (tmpQuery != _query())
-        _setQuery(tmpQuery);
+    select();
 
     return true;
+}
+
+QString SqlTableModel::table() const
+{
+    return tableName();
+}
+
+void SqlTableModel::setTableName(const QString &name)
+{
+    setTable(name);
+    emit tableChanged();
+}
+
+QString SqlTableModel::_filter() const
+{
+    return filter();
+}
+
+void SqlTableModel::setFilterTable(const QString &filter)
+{
+    setFilter(filter);
+    emit filterChanged();
+}
+
+QString SqlTableModel::selectStatement() const
+{
+    if (!m_customQuery.isEmpty())
+        return m_customQuery;
+
+    return QSqlTableModel::selectStatement();
+}
+
+bool SqlTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+//    qWarning() << rowCount() << this << "setData" << index << value << role;
+
+    if (role >= Qt::UserRole && (role - Qt::UserRole) < columnCount())
+        return QSqlTableModel::setData(createIndex(index.row(), role - Qt::UserRole), value, Qt::EditRole);
+
+    return QSqlTableModel::setData(index, value, role);
+}
+
+void SqlTableModel::dataUpdated(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    if (m_submitFlag)
+    {
+        for (int row = topLeft.row(); row <= bottomRight.row(); ++row)
+            m_submittedRows << row;
+    }
+}
+
+bool SqlTableModel::submit()
+{
+    QElapsedTimer timer;
+    timer.start();
+
+    m_submittedRows.clear();
+    m_submitFlag = true;
+
+    bool res = QSqlTableModel::submit();
+
+    m_submitFlag = false;
+
+//    for (auto row : m_submittedRows)
+//        selectRow(row);
+
+    select();
+
+    qWarning() << "submitted rows" << m_submittedRows << "PERFO" << timer.elapsed();
+
+    return res;
 }
