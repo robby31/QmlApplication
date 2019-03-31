@@ -10,12 +10,10 @@ SqlTableModel::SqlTableModel(QObject *parent):
     connect(this, &SqlTableModel::modelReset, this, &SqlTableModel::columnCountChanged);
     connect(this, &SqlTableModel::columnsInserted, this, &SqlTableModel::columnCountChanged);
     connect(this, &SqlTableModel::columnsRemoved, this, &SqlTableModel::columnCountChanged);
-
-    connect(this, &SqlTableModel::dataChanged, this, &SqlTableModel::dataUpdated);
 }
 
 SqlTableModel::SqlTableModel(const QString &connectionName, QObject *parent):
-    QSqlTableModel (parent, GET_DATABASE(connectionName))
+    QSqlTableModel(parent, GET_DATABASE(connectionName))
 {
     connect(this, &SqlTableModel::modelReset, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsInserted, this, &SqlTableModel::rowCountChanged);
@@ -24,8 +22,6 @@ SqlTableModel::SqlTableModel(const QString &connectionName, QObject *parent):
     connect(this, &SqlTableModel::modelReset, this, &SqlTableModel::columnCountChanged);
     connect(this, &SqlTableModel::columnsInserted, this, &SqlTableModel::columnCountChanged);
     connect(this, &SqlTableModel::columnsRemoved, this, &SqlTableModel::columnCountChanged);
-
-    connect(this, &SqlTableModel::dataChanged, this, &SqlTableModel::dataUpdated);
 }
 
 QString SqlTableModel::_query() const
@@ -79,10 +75,21 @@ void SqlTableModel::queryChange()
     _initRoles();
 
     emit queryChanged();
+
+    if (lastError().isValid())
+        emit errorChanged();
+}
+
+QString SqlTableModel::error() const
+{
+    return lastError().text();
 }
 
 void SqlTableModel::_setQuery(const QString &cmd)
 {
+    if (cmd.contains("WHERE"))
+        qCritical() << "query for SqlTableModel shall not contain WHERE statement," << cmd;
+
     m_customQuery = cmd;
 }
 
@@ -97,23 +104,11 @@ bool SqlTableModel::remove(const int &index, const int &count)
     if (!removeRows(index, count))
     {
         qCritical() << "cannot remove row" << index << count;
+        emit errorChanged();
         return false;
     }
-
-    if (!submitAll())
-    {
-        qCritical() << "cannot submit changes" << lastError();
-        return false;
-    }
-
-    select();
 
     return true;
-}
-
-QString SqlTableModel::table() const
-{
-    return tableName();
 }
 
 void SqlTableModel::setTableName(const QString &name)
@@ -135,10 +130,33 @@ void SqlTableModel::setFilterTable(const QString &filter)
 
 QString SqlTableModel::selectStatement() const
 {
-    if (!m_customQuery.isEmpty())
-        return m_customQuery;
+    QString tmpQuery;
 
-    return QSqlTableModel::selectStatement();
+    if (!m_customQuery.isEmpty())
+    {
+        tmpQuery = m_customQuery;
+
+        if (!join().isEmpty())
+            tmpQuery += " " + join();
+
+        if (!filter().isEmpty())
+            tmpQuery += " WHERE " + filter();
+
+        if (!orderByClause().isEmpty())
+            tmpQuery += " " + orderByClause();
+    }
+    else
+    {
+        if (!join().isEmpty())
+            qWarning() << "you shall set query to use JOIN";
+
+        tmpQuery = QSqlTableModel::selectStatement();
+    }
+
+    if (!group().isEmpty())
+        tmpQuery += " GROUP BY " + group();
+
+    return tmpQuery;
 }
 
 bool SqlTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -151,33 +169,38 @@ bool SqlTableModel::setData(const QModelIndex &index, const QVariant &value, int
     return QSqlTableModel::setData(index, value, role);
 }
 
-void SqlTableModel::dataUpdated(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+void SqlTableModel::setOrderClause(const QString &stmt)
 {
-    if (m_submitFlag)
-    {
-        for (int row = topLeft.row(); row <= bottomRight.row(); ++row)
-            m_submittedRows << row;
-    }
+    m_customOrder = stmt;
+    emit orderByClauseChanged();
 }
 
-bool SqlTableModel::submit()
+QString SqlTableModel::orderByClause() const
 {
-    QElapsedTimer timer;
-    timer.start();
+    if (!m_customOrder.isEmpty())
+        return m_customOrder;
 
-    m_submittedRows.clear();
-    m_submitFlag = true;
+    return QSqlTableModel::orderByClause();
+}
 
-    bool res = QSqlTableModel::submit();
+QString SqlTableModel::group() const
+{
+    return m_customGroup;
+}
 
-    m_submitFlag = false;
+void SqlTableModel::setGroup(const QString &group)
+{
+    m_customGroup = group;
+    emit groupChanged();
+}
 
-//    for (auto row : m_submittedRows)
-//        selectRow(row);
+QString SqlTableModel::join() const
+{
+    return m_customJoin;
+}
 
-    select();
-
-    qWarning() << "submitted rows" << m_submittedRows << "PERFO" << timer.elapsed();
-
-    return res;
+void SqlTableModel::setJoin(const QString &join)
+{
+    m_customJoin = join;
+    emit joinChanged();
 }
