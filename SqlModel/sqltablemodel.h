@@ -75,6 +75,9 @@ signals:
 public slots:
     virtual bool remove(const int &index, const int &count = 1);
 
+    QVariantMap get(const int &index);
+    int append(const QVariantMap &data);
+
 private:
     QString m_customQuery;
     QString m_customOrder;

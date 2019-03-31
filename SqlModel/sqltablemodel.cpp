@@ -204,3 +204,41 @@ void SqlTableModel::setJoin(const QString &join)
     m_customJoin = join;
     emit joinChanged();
 }
+
+QVariantMap SqlTableModel::get(const int &index)
+{
+    QVariantMap res;
+
+    if (index >=0 && index < rowCount())
+    {
+        QSqlRecord data = record(index);
+        for (int i=0;i<data.count();++i)
+            res[data.fieldName(i)] = data.value(i);
+    }
+
+    return res;
+}
+
+int SqlTableModel::append(const QVariantMap &data)
+{
+    QStringList keys = data.keys();
+    QStringList params;
+    foreach (QString param, keys)
+        params << QString(":%1").arg(param);
+
+    QSqlQuery query(database());
+
+    QString cmd = QString("INSERT INTO %3 (%1) VALUES(%2)").arg(keys.join(","), params.join(","), tableName());
+    query.prepare(cmd);
+
+    foreach (QString param, keys)
+        query.bindValue(QString(":%1").arg(param), data[param]);
+
+    if (!query.exec())
+    {
+        qCritical() << "invalid query" << query.lastError().text();
+        return -1;
+    }
+
+    return query.lastInsertId().toInt();
+}
