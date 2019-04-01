@@ -19,6 +19,7 @@ class SqlTableModel : public QSqlTableModel
 
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
 
+    Q_PROPERTY(int count READ _rowCount NOTIFY rowCountChanged)
     Q_PROPERTY(int rowCount READ _rowCount NOTIFY rowCountChanged)
     Q_PROPERTY(int columnCount READ _columnCount NOTIFY columnCountChanged)
 

@@ -87,9 +87,6 @@ QString SqlTableModel::error() const
 
 void SqlTableModel::_setQuery(const QString &cmd)
 {
-    if (cmd.contains("WHERE"))
-        qCritical() << "query for SqlTableModel shall not contain WHERE statement," << cmd;
-
     m_customQuery = cmd;
 }
 
@@ -214,6 +211,9 @@ QVariantMap SqlTableModel::get(const int &index)
         QSqlRecord data = record(index);
         for (int i=0;i<data.count();++i)
             res[data.fieldName(i)] = data.value(i);
+
+        if ((rowCount()-index<5) && canFetchMore())
+            fetchMore();
     }
 
     return res;

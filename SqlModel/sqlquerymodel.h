@@ -13,6 +13,7 @@ class SqlQueryModel : public QSqlQueryModel
 
     Q_PROPERTY(QString connectionName READ connectionName WRITE setConnectionName NOTIFY connectionNameChanged)
     Q_PROPERTY(QString query READ _query WRITE _setQuery NOTIFY queryChanged)
+    Q_PROPERTY(int count READ _rowCount NOTIFY rowCountChanged)
     Q_PROPERTY(int rowCount READ _rowCount NOTIFY rowCountChanged)
     Q_PROPERTY(int columnCount READ _columnCount NOTIFY columnCountChanged)
 
