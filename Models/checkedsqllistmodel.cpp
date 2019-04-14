@@ -57,9 +57,6 @@ void CheckedSqlListModel::setQueryData(const QString &query)
 
 bool CheckedSqlListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    QVector<int> roles;
-    roles << Qt::UserRole+1;
-
     QString strRole = QVariant::fromValue(roleNames()[role]).toString();
 
     if (strRole == "checked")
@@ -71,14 +68,14 @@ bool CheckedSqlListModel::setData(const QModelIndex &index, const QVariant &valu
             if (!value.toBool())
             {
                 m_filteredName << name;
-                emit dataChanged(index, index, roles);
+                emit dataChanged(index, index);
                 return true;
             }
 
             if (m_filteredName.contains(name))
             {
                 m_filteredName.removeOne(name);
-                emit dataChanged(index, index, roles);
+                emit dataChanged(index, index);
                 return true;
             }
         }
@@ -87,14 +84,14 @@ bool CheckedSqlListModel::setData(const QModelIndex &index, const QVariant &valu
             if (value.toBool())
             {
                 m_filteredName.append(name);
-                emit dataChanged(index, index, roles);
+                emit dataChanged(index, index);
                 return true;
             }
 
             if (m_filteredName.contains(name))
             {
                 m_filteredName.removeOne(name);
-                emit dataChanged(index, index, roles);
+                emit dataChanged(index, index);
                 return true;
             }
         }
@@ -108,9 +105,7 @@ void CheckedSqlListModel::selectAll()
     setAllChecked(true);
     m_filteredName.clear();
 
-    QVector<int> roles;
-    roles << Qt::UserRole+1;
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount()-1, 1), roles);
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount()-1, 1));
 }
 
 void CheckedSqlListModel::unSelectAll()
@@ -118,9 +113,7 @@ void CheckedSqlListModel::unSelectAll()
     setAllChecked(false);
     m_filteredName.clear();
 
-    QVector<int> roles;
-    roles << Qt::UserRole+1;
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount()-1, 1), roles);
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount()-1, 1));
 }
 
 QString CheckedSqlListModel::checkedFilterCmd()
