@@ -159,11 +159,9 @@ void tst_sqlquerymodel::testCase_SqlTableModel()
     QCOMPARE(db.isOpen(), true);
 
     SqlTableModel model("TESTS");
-    model.setConnectionName("TESTS");
     model.setTable("data");
     model._setQuery("SELECT * FROM data");
 
-    QCOMPARE(model.connectionName(), "TESTS");
     QCOMPARE(model.tableName(), "data");
     QCOMPARE(model._query(), "SELECT * FROM data");
     QCOMPARE(model.rowCount(), 1000);
@@ -199,11 +197,9 @@ void tst_sqlquerymodel::testCase_SqlTableModel_remove()
     QCOMPARE(db.isOpen(), true);
 
     SqlTableModel model("TESTS");
-    model.setConnectionName("TESTS");
     model.setTable("data");
     model._setQuery("SELECT * FROM data");
 
-    QCOMPARE(model.connectionName(), "TESTS");
     QCOMPARE(model.tableName(), "data");
     QCOMPARE(model._query(), "SELECT * FROM data");
     QCOMPARE(model.rowCount(), 999);
@@ -212,7 +208,6 @@ void tst_sqlquerymodel::testCase_SqlTableModel_remove()
     QCOMPARE(model.data(model.index(0, 0), Qt::DisplayRole), 2);
 
     QCOMPARE(model.remove(0), true);
-    QCOMPARE(model.connectionName(), "TESTS");
     QCOMPARE(model._query(), "SELECT * FROM data");
     QCOMPARE(model.rowCount(), 998);
     QCOMPARE(model.columnCount(), 3);
@@ -260,7 +255,6 @@ void tst_sqlquerymodel::testCase_SqlTableModel_benchmark()
     QBENCHMARK
     {
         SqlTableModel model("TESTS");
-        model.setConnectionName("TESTS");
         model.setTable("data");
         model._setQuery("SELECT * FROM data");
         QCOMPARE(model.rowCount(), 1000);

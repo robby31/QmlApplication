@@ -60,7 +60,9 @@ SOURCES +=  \
     Worker/databaseworker.cpp \
     SqlModel/myvxymodelmapper.cpp \
     SqlModel/sqlquerymodel.cpp \
-    SqlModel/sqltablemodel.cpp
+    SqlModel/sqltablemodel.cpp \
+    Document/markupdocument.cpp \
+    Document/markupblock.cpp
 
 
 HEADERS +=  \
@@ -88,8 +90,12 @@ HEADERS +=  \
     SqlModel/myvxymodelmapper.h \
     SqlModel/sqlquerymodel.h \
     SqlModel/sqltablemodel.h \
-    mynetwork.h
+    mynetwork.h \
+    Document/markupdocument.h \
+    Document/markupblock.h
 
+#DEFINES += PROFILING
+INCLUDEPATH += $$(MYLIBRARY)/$$QT_VERSION/include/analyzer
 
 installPath = $$(MYLIBRARY)/$$QT_VERSION
 target.path = $$installPath
@@ -121,6 +127,10 @@ INSTALLS += app
 config.files = Config/*.h
 config.path = $$installIncludePath/Config
 INSTALLS += config
+
+document.files = Document/*.h
+document.path = $$installIncludePath/Document
+INSTALLS += document
 
 io.files = IO/*.h
 io.path = $$installIncludePath/IO
