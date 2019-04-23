@@ -14,7 +14,7 @@ MarkupBlock::MarkupBlock(const QString &name, const QString &attributes, const Q
     ANALYZER;
 
     // parse attributes
-    QRegularExpression pattern(R"((?P<param>[^=]+)\s*=\s*\\?"(?P<value>[^\\"]+)\\?")");
+    QRegularExpression pattern(R"((?P<param>[^=]+)\s*=\s*\"(?P<value>[^"]+)\")");
     QRegularExpressionMatchIterator iterator = pattern.globalMatch(attributes.trimmed());
     while (iterator.hasNext())
     {
