@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>doc1.html</file>
+        <file>doc1.xml</file>
+        <file>doc2.html</file>
     </qresource>
 </RCC>

@@ -161,10 +161,11 @@ void tst_sqlquerymodel::testCase_SqlTableModel()
     SqlTableModel model("TESTS");
     model.setTable("data");
     model._setQuery("SELECT * FROM data");
+    model.select();
 
     QCOMPARE(model.tableName(), "data");
     QCOMPARE(model._query(), "SELECT * FROM data");
-    QCOMPARE(model.rowCount(), 1000);
+    QCOMPARE(model.rowCount(), 256);
     QCOMPARE(model.columnCount(), 3);
     QCOMPARE(model.roleNames().size(), 4);
 
@@ -199,21 +200,22 @@ void tst_sqlquerymodel::testCase_SqlTableModel_remove()
     SqlTableModel model("TESTS");
     model.setTable("data");
     model._setQuery("SELECT * FROM data");
+    model.select();
 
     QCOMPARE(model.tableName(), "data");
     QCOMPARE(model._query(), "SELECT * FROM data");
-    QCOMPARE(model.rowCount(), 999);
+    QCOMPARE(model.rowCount(), 256);
     QCOMPARE(model.columnCount(), 3);
     QCOMPARE(model.roleNames().size(), 4);
     QCOMPARE(model.data(model.index(0, 0), Qt::DisplayRole), 2);
 
     QCOMPARE(model.remove(0), true);
     QCOMPARE(model._query(), "SELECT * FROM data");
-    QCOMPARE(model.rowCount(), 998);
+    QCOMPARE(model.rowCount(), 256);
     QCOMPARE(model.columnCount(), 3);
     QCOMPARE(model.roleNames().size(), 4);
 
-    QCOMPARE(model.data(model.index(0, 0), Qt::DisplayRole), 3);
+    QCOMPARE(model.data(model.index(0, 0), Qt::DisplayRole), QVariant());  // null item model shall be refreshed
 }
 
 void tst_sqlquerymodel::testCase_SqlListModel_benchmark()
@@ -257,6 +259,7 @@ void tst_sqlquerymodel::testCase_SqlTableModel_benchmark()
         SqlTableModel model("TESTS");
         model.setTable("data");
         model._setQuery("SELECT * FROM data");
-        QCOMPARE(model.rowCount(), 1000);
+        model.select();
+        QCOMPARE(model.rowCount(), 256);
     }
 }
