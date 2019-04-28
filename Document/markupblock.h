@@ -6,7 +6,7 @@
 #include <QRegularExpression>
 #include "analyzer.h"
 
-enum class TYPE { DocType, Comment, Element };
+enum class TYPE { DocType, Comment, Element, Data };
 
 class MarkupBlock : public QObject
 {
@@ -14,7 +14,8 @@ class MarkupBlock : public QObject
 
 public:
     explicit MarkupBlock(QObject *parent = Q_NULLPTR);
-    explicit MarkupBlock(const QString &name, const QString &attributes, const QString &data, QObject *parent = Q_NULLPTR);
+    explicit MarkupBlock(const QString &name, const QString &attributes, const QString &str_definition, QObject *parent = Q_NULLPTR);
+    explicit MarkupBlock(const QString &data, QObject *parent = Q_NULLPTR);
 
     bool isValid() const;
 
@@ -27,15 +28,19 @@ public:
     QString name() const;
     QHash<QString, QVariant> attributes() const;
 
+    void set_data(const QString &data);
+
     QString toString() const;
 
+    int index();
     void appendChild(MarkupBlock *block);
-    QList<MarkupBlock*> children() const;
-    QList<MarkupBlock*> findBlocks(const QString &name, const QHash<QString, QVariant> attributes = QHash<QString, QVariant>());
+    MarkupBlock *appendChild(const QString &name, const QString &attributes, const QString &str_definition);
+    QList<MarkupBlock*> blocks() const;
+    QList<MarkupBlock*> findBlocks(const QString &name,  QHash<QString, QVariant> attributes = QHash<QString, QVariant>());
 
 private:
     QString m_name;
-    QString m_data;
+    QString m_definition;
     QHash<QString, QVariant> m_attributes;
     QList<MarkupBlock*> m_blocks;
 };

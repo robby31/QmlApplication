@@ -7,7 +7,7 @@
 
 #include "analyzer.h"
 
-enum class DOC_TYPE { UNKNOWN, HTML };
+enum class DOC_TYPE { UNKNOWN, HTML, XML };
 
 class MarkupDocument : public QObject
 {
@@ -17,10 +17,14 @@ public:
     explicit MarkupDocument(QObject *parent = Q_NULLPTR);
 
     void setContent(const QByteArray &data);
+    void clear();
 
     DOC_TYPE docType() const;
 
     bool isValid() const;
+
+    MarkupBlock *appendChild(const QString &name, const QString &attributes, const QString &str_definition);
+    MarkupBlock *appendChild(const QString &data);
 
     MarkupBlock *firstBlock() const;
     QList<MarkupBlock*> blocks() const;
@@ -30,7 +34,7 @@ private:
     void parse_data();
 
 private:
-    QByteArray m_data;
+    QString m_data;
     QList<MarkupBlock*> m_blocks;
 };
 

@@ -6,15 +6,15 @@ MarkupBlock::MarkupBlock(QObject *parent):
     ANALYZER;
 }
 
-MarkupBlock::MarkupBlock(const QString &name, const QString &attributes, const QString &data, QObject *parent):
+MarkupBlock::MarkupBlock(const QString &name, const QString &attributes, const QString &str_definition, QObject *parent):
     QObject(parent),
     m_name(name),
-    m_data(data)
+    m_definition(str_definition)
 {
     ANALYZER;
 
     // parse attributes
-    QRegularExpression pattern(R"((?P<param>[^=]+)\s*=\s*\"(?P<value>[^"]+)\")");
+    QRegularExpression pattern(R"((?P<param>[^=]+)\s*=\s*["'](?P<value>[^"']+)["']?)");
     QRegularExpressionMatchIterator iterator = pattern.globalMatch(attributes.trimmed());
     while (iterator.hasNext())
     {
@@ -23,11 +23,19 @@ MarkupBlock::MarkupBlock(const QString &name, const QString &attributes, const Q
     }
 }
 
+MarkupBlock::MarkupBlock(const QString &data, QObject *parent):
+    QObject(parent),
+    m_definition(data)
+{
+    ANALYZER;
+
+}
+
 bool MarkupBlock::isValid() const
 {
     ANALYZER;
 
-    return !m_name.isEmpty() && !m_data.isEmpty();
+    return !m_name.isEmpty() && !m_definition.isEmpty();
 }
 
 QString MarkupBlock::name() const
@@ -46,7 +54,7 @@ QString MarkupBlock::toString() const
 {
     ANALYZER;
 
-    return m_data;
+    return m_definition;
 }
 
 void MarkupBlock::appendChild(MarkupBlock *block)
@@ -58,7 +66,16 @@ void MarkupBlock::appendChild(MarkupBlock *block)
     qDebug() << name() << "APPEND CHILD" << block->name();
 }
 
-QList<MarkupBlock*> MarkupBlock::children() const
+MarkupBlock *MarkupBlock::appendChild(const QString &name, const QString &attributes, const QString &str_definition)
+{
+    ANALYZER;
+
+    auto block = new MarkupBlock(name, attributes, str_definition);
+    appendChild(block);
+    return block;
+}
+
+QList<MarkupBlock*> MarkupBlock::blocks() const
 {
     ANALYZER;
 
@@ -101,7 +118,7 @@ QList<MarkupBlock*> MarkupBlock::findBlocks(const QString &name, const QHash<QSt
             res << this;
     }
 
-    for (auto child : children())
+    for (auto child : blocks())
         res << child->findBlocks(name, attributes);
 
     return res;
@@ -111,18 +128,39 @@ TYPE MarkupBlock::type() const
 {
     ANALYZER;
 
-    if (m_name == "!doctype")
+    if (m_name.toLower() == "!doctype")
         return TYPE::DocType;
 
-    if (m_name.startsWith("!--"))
+    if (m_name.toLower().startsWith("?xml"))
+        return TYPE::DocType;
+
+    if (m_name.toLower().startsWith("!--"))
         return TYPE::Comment;
 
-    return TYPE::Element;
+    if (!m_name.isEmpty())
+        return TYPE::Element;
+
+    return TYPE::Data;
 }
 
 bool MarkupBlock::isEndTag() const
 {
     ANALYZER;
 
-    return m_name.startsWith("/") or m_data.endsWith("/>");
+    return m_name.startsWith("/") or m_definition.endsWith("/>");
+}
+
+int MarkupBlock::index()
+{
+    MarkupBlock *parent = parentBlock();
+    if (parent)
+        return parent->blocks().indexOf(this);
+
+    return 0;
+}
+
+void MarkupBlock::set_data(const QString &data)
+{
+    auto block = new MarkupBlock(data);
+    appendChild(block);
 }

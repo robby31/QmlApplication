@@ -10,8 +10,16 @@ void MarkupDocument::setContent(const QByteArray &data)
 {
     ANALYZER;
 
+    clear();
     m_data = data;
     parse_data();
+}
+
+void MarkupDocument::clear()
+{
+    qDeleteAll(m_blocks);
+    m_blocks.clear();
+    m_data.clear();
 }
 
 MarkupBlock *MarkupDocument::firstBlock() const
@@ -28,31 +36,51 @@ void MarkupDocument::parse_data()
 {
     ANALYZER;
 
-    QStringList blockNameWithNoParent;
-    blockNameWithNoParent << "link" << "br" << "hr" << "img" << "input";
+    QStringList singletonTag;
+    singletonTag << "area" << "base" << "br" << "col" << "command" << "embed" << "hr" << "img" << "input" << "keygen" << "link" << "meta" << "param" << "source" << "track" << "wbr";
 
     MarkupBlock *lastBlock = Q_NULLPTR;
 
     // parse data
-    QRegularExpression pattern(R"(<((?P<name>[/!]?\w+)(?P<attributes>\s[^>]*)?)>)");
+    QRegularExpression pattern(R"((<(?P<name>!--|[/!?]?[\w:]+)(?P<attributes>\s[^>]*)?>))");
+    if (!pattern.isValid())
+        qCritical() << pattern.errorString();
+
     QRegularExpressionMatchIterator iterator = pattern.globalMatch(m_data);
+    int capturedIndex = -1;
     while (iterator.hasNext())
     {
         QRegularExpressionMatch match = iterator.next();
-        qDebug() << match.capturedStart() << match.captured("name") << match.captured("attributes");
+        qDebug() << match.capturedStart() << match.capturedEnd() << match.captured("name") << match.captured("attributes") << match.captured(0) << m_data.mid(match.capturedStart(), match.capturedLength());
 
-        MarkupBlock *block = new MarkupBlock(match.captured("name"), match.captured("attributes"), match.captured(0));
+        if (capturedIndex != -1 && capturedIndex != match.capturedStart())
+        {
+            if (capturedIndex >= match.capturedStart())
+            {
+                qCritical() << "invalid block containing data" << capturedIndex << match.capturedStart() << m_data.mid(capturedIndex, match.capturedStart()-capturedIndex);
+            }
+            else
+            {
+                qDebug() << "DATA" << capturedIndex << match.capturedStart()-capturedIndex << m_data.mid(capturedIndex, match.capturedStart()-capturedIndex);
+
+                if (lastBlock)
+                    lastBlock->set_data(m_data.mid(capturedIndex, match.capturedStart()-capturedIndex));
+                else
+                    appendChild(m_data.mid(capturedIndex, match.capturedStart()-capturedIndex));
+            }
+        }
+
+        MarkupBlock *block = Q_NULLPTR;
 
         if (!lastBlock)
         {
-            m_blocks.append(block);
-            block->setParent(this);
+            block = appendChild(match.captured("name"), match.captured("attributes"), match.captured(0));
         }
         else
         {
-            lastBlock->appendChild(block);
+            block = lastBlock->appendChild(match.captured("name"), match.captured("attributes"), match.captured(0));
 
-            if (block->name().startsWith("/"))
+            if (block && block->name().startsWith("/"))
             {
                 if (lastBlock->name() == block->name().right(block->name().size()-1))
                     lastBlock = lastBlock->parentBlock();
@@ -61,13 +89,35 @@ void MarkupDocument::parse_data()
             }
         }
 
-        if (!match.captured("name").startsWith("!") && !match.captured("name").startsWith("/") && !match.captured(0).endsWith("/>"))
+        if (block && !block->isEndTag() && block->type() == TYPE::Element)
             lastBlock = block;
 
         // some block cannot have parents
-        if (lastBlock && blockNameWithNoParent.contains(lastBlock->name()))
+        if (lastBlock && singletonTag.contains(lastBlock->name()))
             lastBlock = lastBlock->parentBlock();
+
+        capturedIndex = match.capturedEnd();
     }
+}
+
+MarkupBlock *MarkupDocument::appendChild(const QString &name, const QString &attributes, const QString &str_definition)
+{
+    ANALYZER;
+
+    auto block = new MarkupBlock(name, attributes, str_definition);
+    block->setParent(this);
+    m_blocks.append(block);
+    return block;
+}
+
+MarkupBlock *MarkupDocument::appendChild(const QString &data)
+{
+    ANALYZER;
+
+    auto block = new MarkupBlock(data);
+    block->setParent(this);
+    m_blocks.append(block);
+    return block;
 }
 
 QList<MarkupBlock*> MarkupDocument::blocks() const
@@ -99,8 +149,11 @@ DOC_TYPE MarkupDocument::docType() const
     MarkupBlock *block = firstBlock();
     if (block && block->type() == TYPE::DocType)
     {
-        if (block->toString() == "<!doctype html>")
+        if (block->toString().toLower() == "<!doctype html>")
             return DOC_TYPE::HTML;
+
+        if (block->toString().toLower().startsWith("<?xml"))
+            return DOC_TYPE::XML;
     }
 
     return DOC_TYPE::UNKNOWN;
