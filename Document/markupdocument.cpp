@@ -6,7 +6,7 @@ MarkupDocument::MarkupDocument(QObject *parent):
     ANALYZER;
 }
 
-void MarkupDocument::setContent(const QByteArray &data)
+void MarkupDocument::setContent(const QString &data)
 {
     ANALYZER;
 
@@ -114,9 +114,15 @@ MarkupBlock *MarkupDocument::appendChild(const QString &data)
 {
     ANALYZER;
 
-    auto block = new MarkupBlock(data);
-    block->setParent(this);
-    m_blocks.append(block);
+    MarkupBlock *block = Q_NULLPTR;
+
+    if (!data.trimmed().isEmpty())
+    {
+        block = new MarkupBlock(data.trimmed());
+        block->setParent(this);
+        m_blocks.append(block);
+    }
+
     return block;
 }
 
@@ -164,4 +170,9 @@ bool MarkupDocument::isValid() const
     ANALYZER;
 
     return docType() != DOC_TYPE::UNKNOWN;
+}
+
+QString MarkupDocument::toString() const
+{
+    return m_data;
 }

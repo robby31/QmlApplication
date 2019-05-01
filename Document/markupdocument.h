@@ -16,12 +16,14 @@ class MarkupDocument : public QObject
 public:
     explicit MarkupDocument(QObject *parent = Q_NULLPTR);
 
-    void setContent(const QByteArray &data);
+    void setContent(const QString &data);
     void clear();
 
     DOC_TYPE docType() const;
 
     bool isValid() const;
+
+    QString toString() const;
 
     MarkupBlock *appendChild(const QString &name, const QString &attributes, const QString &str_definition);
     MarkupBlock *appendChild(const QString &data);

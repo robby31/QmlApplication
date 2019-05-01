@@ -161,6 +161,9 @@ int MarkupBlock::index()
 
 void MarkupBlock::set_data(const QString &data)
 {
-    auto block = new MarkupBlock(data);
-    appendChild(block);
+    if (!data.trimmed().isEmpty())
+    {
+        auto block = new MarkupBlock(data.trimmed());
+        appendChild(block);
+    }
 }
