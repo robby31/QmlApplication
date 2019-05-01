@@ -38,6 +38,7 @@ CONFIG += c++14
 CONFIG += staticlib
 
 SOURCES +=  \
+    Document/markupdocmodel.cpp \
             Models/listmodel.cpp \
             Models/program.cpp \
             application.cpp \
@@ -92,6 +93,7 @@ HEADERS +=  \
     SqlModel/sqltablemodel.h \
     mynetwork.h \
     Document/markupdocument.h \
+    Document/markupdocmodel.h \
     Document/markupblock.h
 
 #DEFINES += PROFILING
