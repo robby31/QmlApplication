@@ -155,24 +155,18 @@ void tst_markupdocument::testCase_Xml()
     }
 
     QList<MarkupBlock*> blocks = doc.blocks();
-    QCOMPARE(blocks.size(), 3);
+    QCOMPARE(blocks.size(), 2);
     QCOMPARE(blocks.at(0)->type(), TYPE::DocType);
     QCOMPARE(blocks.at(0)->name(), "?xml");
     QCOMPARE(blocks.at(0)->attributes().size(), 1);
     QCOMPARE(blocks.at(0)->parentBlock(), Q_NULLPTR);
     QCOMPARE(blocks.at(0)->blocks().size(), 0);
 
-    QCOMPARE(blocks.at(1)->type(), TYPE::Data);
-    QCOMPARE(blocks.at(1)->name(), "");
-    QCOMPARE(blocks.at(1)->attributes().size(), 0);
+    QCOMPARE(blocks.at(1)->type(), TYPE::Element);
+    QCOMPARE(blocks.at(1)->name(), "s:Envelope");
+    QCOMPARE(blocks.at(1)->attributes().size(), 2);
     QCOMPARE(blocks.at(1)->parentBlock(), Q_NULLPTR);
-    QCOMPARE(blocks.at(1)->blocks().size(), 0);
-
-    QCOMPARE(blocks.at(2)->type(), TYPE::Element);
-    QCOMPARE(blocks.at(2)->name(), "s:Envelope");
-    QCOMPARE(blocks.at(2)->attributes().size(), 2);
-    QCOMPARE(blocks.at(2)->parentBlock(), Q_NULLPTR);
-    QCOMPARE(blocks.at(2)->blocks().size(), 2);
+    QCOMPARE(blocks.at(1)->blocks().size(), 2);
 }
 
 void tst_markupdocument::testCase_Html2()
@@ -199,59 +193,47 @@ void tst_markupdocument::testCase_Html2()
     }
 
     QList<MarkupBlock*> blocks = doc.blocks();
-    QCOMPARE(blocks.size(), 5);
+    QCOMPARE(blocks.size(), 3);
     QCOMPARE(blocks.at(0)->type(), TYPE::DocType);
     QCOMPARE(blocks.at(0)->name(), "!DOCTYPE");
     QCOMPARE(blocks.at(0)->attributes().size(), 0);
     QCOMPARE(blocks.at(0)->parentBlock(), Q_NULLPTR);
     QCOMPARE(blocks.at(0)->blocks().size(), 0);
 
-    QCOMPARE(blocks.at(1)->type(), TYPE::Data);
-    QCOMPARE(blocks.at(1)->name(), "");
+    QCOMPARE(blocks.at(1)->type(), TYPE::Comment);
+    QCOMPARE(blocks.at(1)->name(), "!--");
     QCOMPARE(blocks.at(1)->attributes().size(), 0);
     QCOMPARE(blocks.at(1)->parentBlock(), Q_NULLPTR);
     QCOMPARE(blocks.at(1)->blocks().size(), 0);
+    QCOMPARE(blocks.at(1)->toString(), "<!-- saved from url=(0069)https://www.france.tv/france-2/taratata/957911-taratata-100-live.html -->");
 
-    QCOMPARE(blocks.at(2)->type(), TYPE::Comment);
-    QCOMPARE(blocks.at(2)->name(), "!--");
+    QCOMPARE(blocks.at(2)->type(), TYPE::Element);
+    QCOMPARE(blocks.at(2)->name(), "html");
     QCOMPARE(blocks.at(2)->attributes().size(), 0);
     QCOMPARE(blocks.at(2)->parentBlock(), Q_NULLPTR);
-    QCOMPARE(blocks.at(2)->blocks().size(), 0);
-    QCOMPARE(blocks.at(2)->toString(), "<!-- saved from url=(0069)https://www.france.tv/france-2/taratata/957911-taratata-100-live.html -->");
-
-    QCOMPARE(blocks.at(3)->type(), TYPE::Data);
-    QCOMPARE(blocks.at(3)->name(), "");
-    QCOMPARE(blocks.at(3)->attributes().size(), 0);
-    QCOMPARE(blocks.at(3)->parentBlock(), Q_NULLPTR);
-    QCOMPARE(blocks.at(3)->blocks().size(), 0);
-
-    QCOMPARE(blocks.at(4)->type(), TYPE::Element);
-    QCOMPARE(blocks.at(4)->name(), "html");
-    QCOMPARE(blocks.at(4)->attributes().size(), 0);
-    QCOMPARE(blocks.at(4)->parentBlock(), Q_NULLPTR);
-    QCOMPARE(blocks.at(4)->blocks().size(), 3);
+    QCOMPARE(blocks.at(2)->blocks().size(), 3);
 
     // check html
-    blocks = doc.blocks().at(4)->blocks();
+    blocks = doc.blocks().at(2)->blocks();
     QCOMPARE(blocks.size(), 3);
     QCOMPARE(blocks.at(0)->type(), TYPE::Element);
     QCOMPARE(blocks.at(0)->name(), "head");
     QCOMPARE(blocks.at(0)->attributes().size(), 0);
-    QCOMPARE(blocks.at(0)->parentBlock(), doc.blocks().at(4));
+    QCOMPARE(blocks.at(0)->parentBlock(), doc.blocks().at(2));
     QCOMPARE(blocks.at(0)->blocks().size(), 64);
 
     // check body
     QCOMPARE(blocks.at(1)->type(), TYPE::Element);
     QCOMPARE(blocks.at(1)->name(), "body");
     QCOMPARE(blocks.at(1)->attributes().size(), 1);
-    QCOMPARE(blocks.at(1)->parentBlock(), doc.blocks().at(4));
+    QCOMPARE(blocks.at(1)->parentBlock(), doc.blocks().at(2));
     QCOMPARE(blocks.at(1)->blocks().size(), 24);
 
     blocks = blocks.at(1)->blocks();
     QCOMPARE(blocks.at(0)->type(), TYPE::Element);
     QCOMPARE(blocks.at(0)->name(), "div");
     QCOMPARE(blocks.at(0)->attributes().size(), 2);
-    QCOMPARE(blocks.at(0)->parentBlock(), doc.blocks().at(4)->blocks().at(1));
+    QCOMPARE(blocks.at(0)->parentBlock(), doc.blocks().at(2)->blocks().at(1));
     QCOMPARE(blocks.at(0)->toString(), "<div id=\"fb-root\" class=\" fb_reset\">");
     QCOMPARE(blocks.at(0)->blocks().size(), 2);
 }
