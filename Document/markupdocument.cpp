@@ -4,6 +4,10 @@ MarkupDocument::MarkupDocument(QObject *parent):
     QObject(parent)
 {
     ANALYZER;
+
+    QStringList singletonTag;
+    singletonTag << "area" << "base" << "br" << "col" << "command" << "embed" << "hr" << "img" << "input" << "keygen" << "link" << "meta" << "param" << "source" << "track" << "wbr";
+    setSingletonTag(singletonTag);
 }
 
 void MarkupDocument::setContent(const QString &data)
@@ -36,9 +40,7 @@ void MarkupDocument::parse_data()
 {
     ANALYZER;
 
-    QStringList singletonTag;
-    singletonTag << "area" << "base" << "br" << "col" << "command" << "embed" << "hr" << "img" << "input" << "keygen" << "link" << "meta" << "param" << "source" << "track" << "wbr";
-
+    MarkupBlock *parentBlock = Q_NULLPTR;
     MarkupBlock *lastBlock = Q_NULLPTR;
 
     // parse data
@@ -72,29 +74,32 @@ void MarkupDocument::parse_data()
 
         MarkupBlock *block = Q_NULLPTR;
 
-        if (!lastBlock)
+        if (!parentBlock)
         {
             block = appendChild(match.captured("name"), match.captured("attributes"), match.captured(0));
         }
         else
         {
-            block = lastBlock->appendChild(match.captured("name"), match.captured("attributes"), match.captured(0));
+            block = parentBlock->appendChild(match.captured("name"), match.captured("attributes"), match.captured(0));
 
             if (block && block->name().startsWith("/"))
             {
-                if (lastBlock->name() == block->name().right(block->name().size()-1))
-                    lastBlock = lastBlock->parentBlock();
+                if (parentBlock->name() == block->name().right(block->name().size()-1))
+                    parentBlock = parentBlock->parentBlock();
                 else
-                    qCritical() << "invalid tag" << match.capturedStart() << block->toString() << "parent" << lastBlock->toString();
+                    qCritical() << "invalid tag" << match.capturedStart() << block->toString() << "parent" << parentBlock->toString();
             }
         }
 
         if (block && !block->isEndTag() && block->type() == TYPE::Element)
+        {
+            parentBlock = block;
             lastBlock = block;
+        }
 
         // some block cannot have parents
-        if (lastBlock && singletonTag.contains(lastBlock->name()))
-            lastBlock = lastBlock->parentBlock();
+        if (parentBlock && m_singletonTag.contains(parentBlock->name()))
+            parentBlock = parentBlock->parentBlock();
 
         capturedIndex = match.capturedEnd();
     }
@@ -175,4 +180,9 @@ bool MarkupDocument::isValid() const
 QString MarkupDocument::toString() const
 {
     return m_data;
+}
+
+void MarkupDocument::setSingletonTag(const QStringList &tagList)
+{
+    m_singletonTag = tagList;
 }

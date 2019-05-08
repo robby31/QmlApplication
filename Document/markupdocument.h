@@ -19,6 +19,8 @@ public:
     void setContent(const QString &data);
     void clear();
 
+    void setSingletonTag(const QStringList &tagList);
+
     DOC_TYPE docType() const;
 
     bool isValid() const;
@@ -38,6 +40,7 @@ private:
 private:
     QString m_data;
     QList<MarkupBlock*> m_blocks;
+    QStringList m_singletonTag;
 };
 
 #endif // MARKUPDOCUMENT_H
