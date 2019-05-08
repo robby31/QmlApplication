@@ -38,6 +38,9 @@ public:
     QList<MarkupBlock*> blocks() const;
     QList<MarkupBlock*> findBlocks(const QString &name,  QHash<QString, QVariant> attributes = QHash<QString, QVariant>());
 
+    /* Find unique block with tag <name> */
+    MarkupBlock *findBlock(const QString &name,  QHash<QString, QVariant> attributes = QHash<QString, QVariant>());
+
 private:
     QString m_name;
     QString m_definition;

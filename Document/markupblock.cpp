@@ -124,6 +124,17 @@ QList<MarkupBlock*> MarkupBlock::findBlocks(const QString &name, const QHash<QSt
     return res;
 }
 
+MarkupBlock *MarkupBlock::findBlock(const QString &name, QHash<QString, QVariant> attributes)
+{
+    ANALYZER;
+
+    QList<MarkupBlock*> res = findBlocks(name, attributes);
+    if (res.size() == 1)
+        return res.at(0);
+
+    return Q_NULLPTR;
+}
+
 TYPE MarkupBlock::type() const
 {
     ANALYZER;
