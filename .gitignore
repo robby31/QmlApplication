@@ -5,3 +5,13 @@ QmlApplication.pro.user
 *.8-pre1
 *.user
 *.9-pre1
+tests/.xcode/*
+tests/tests.xcodeproj/*
+tests/Debug/*
+tests/Info.plist
+tests/moc_predefs.h
+tests/moc_tst_markupdocument.cpp
+tests/moc_tst_sqlquerymodel.cpp
+tests/qrc_data.cpp
+tests/target_wrapper.sh
+.qmake.stash

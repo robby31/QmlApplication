@@ -6,8 +6,10 @@
 
 TEMPLATE = lib
 
-TARGET = QmlApplication
-TARGET = $$qtLibraryTarget($$TARGET)
+TARGET = $$qtLibraryTarget(QmlApplication)
+
+CONFIG += debug_and_release
+CONFIG += shared_and_static build_all
 
 QT       += qml quick widgets sql charts
 QT       -= gui
@@ -35,8 +37,6 @@ CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 CONFIG += c++14
 
-CONFIG += staticlib
-
 SOURCES +=  \
     Document/markupdocmodel.cpp \
             Models/listmodel.cpp \
@@ -63,7 +63,8 @@ SOURCES +=  \
     SqlModel/sqlquerymodel.cpp \
     SqlModel/sqltablemodel.cpp \
     Document/markupdocument.cpp \
-    Document/markupblock.cpp
+    Document/markupblock.cpp \
+    debuginfo.cpp
 
 
 HEADERS +=  \
@@ -84,6 +85,7 @@ HEADERS +=  \
     Models/filteringcolumnitem.h \
     Models/basesqllistmodel.h \
     Models/tablemodel.h \
+    debuginfo.h \
     mysqldatabase.h \
     Worker/myrunnable.h \
     Models/pivotmodel.h \
@@ -98,6 +100,7 @@ HEADERS +=  \
 
 #DEFINES += PROFILING
 INCLUDEPATH += $$(MYLIBRARY)/$$QT_VERSION/include/analyzer
+LIBS += -L$$(MYLIBRARY)/$$QT_VERSION -l$$qtLibraryTarget(analyzer)
 
 installPath = $$(MYLIBRARY)/$$QT_VERSION
 target.path = $$installPath
@@ -153,3 +156,14 @@ INSTALLS += uicontroller
 worker.files = Worker/*.h
 worker.path = $$installIncludePath/Worker
 INSTALLS += worker
+
+macx {
+    CONFIG += lib_bundle
+
+    FRAMEWORK_HEADERS.version = Versions
+    FRAMEWORK_HEADERS.files = $${HEADERS}
+    FRAMEWORK_HEADERS.path = include
+    QMAKE_BUNDLE_DATA += FRAMEWORK_HEADERS
+
+    QMAKE_FRAMEWORK_BUNDLE_NAME = QmlApplication
+}
