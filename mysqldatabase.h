@@ -30,4 +30,11 @@
 // remove database
 #define REMOVE_DATABASE(name) QSqlDatabase::removeDatabase(CONNECTION_NAME(name))
 
+inline bool COMMIT_DATABASE(const QString &name)
+{
+    QSqlDatabase db = GET_DATABASE(name);
+    db.close();
+    return db.open();
+}
+
 #endif // MYSQLDATABASE_H
