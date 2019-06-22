@@ -1,44 +1,23 @@
 #include "debuginfo.h"
 
-QList<QObject*> DebugInfo::alive_objects;
-//QList<DebugInfo::T_ELT*> DebugInfo::alive_elements;
+DebugInfoModel *DebugInfo::model = new DebugInfoModel();
 
 void DebugInfo::add_object(QObject *obj)
 {
-    alive_objects << obj;
+    model->add_object(obj);
 }
 
 void DebugInfo::remove_object(QObject *obj)
 {
-    alive_objects.removeAll(obj);
+    model->remove_object(obj);
 }
 
 void DebugInfo::display_alive_objects()
 {
-    if (alive_objects.isEmpty())
-    {
-        qInfo() << "NO ALIVE OBJECTS.";
-    }
-    else
-    {
-        qInfo() << "ALIVE OBJECTS:";
-        for (auto elt : alive_objects)
-            qInfo() << "   " << elt;
-
-//        for (auto elt : alive_elements)
-//            qInfo() << "   " << elt->className << elt->ptr;
-    }
-
-    qInfo() << "";
+    model->display_alive_objects();
 }
 
 int DebugInfo::count_alive_objects(const QString &className)
 {
-    int res = 0;
-    for (auto elt : alive_objects)
-    {
-        if (elt && (className.isNull() or elt->metaObject()->className() == className))
-            ++res;
-    }
-    return res;
+    return model->count_alive_objects(className);
 }

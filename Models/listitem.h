@@ -9,7 +9,7 @@ class ListItem : public QObject
     Q_OBJECT
 
 public:
-    explicit ListItem(QObject* parent = 0);
+    explicit ListItem(QObject* parent = Q_NULLPTR);
 
     virtual QString id() const { return QString("%1").arg(quintptr(this)); }
 

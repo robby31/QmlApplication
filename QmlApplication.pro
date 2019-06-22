@@ -64,7 +64,9 @@ SOURCES +=  \
     SqlModel/sqltablemodel.cpp \
     Document/markupdocument.cpp \
     Document/markupblock.cpp \
-    debuginfo.cpp
+    debuginfo.cpp \
+    debuginfoitem.cpp \
+    debuginfomodel.cpp
 
 
 HEADERS +=  \
@@ -86,6 +88,8 @@ HEADERS +=  \
     Models/basesqllistmodel.h \
     Models/tablemodel.h \
     debuginfo.h \
+    debuginfoitem.h \
+    debuginfomodel.h \
     mysqldatabase.h \
     Worker/myrunnable.h \
     Models/pivotmodel.h \

@@ -5,12 +5,10 @@
 #include <QDebug>
 using namespace std;
 
+#include "debuginfomodel.h"
+
 class DebugInfo
 {
-    typedef struct {
-        void *ptr = Q_NULLPTR;
-        QString className;
-    } T_ELT;
 
 public:
     DebugInfo(DebugInfo const&) = delete;
@@ -22,9 +20,10 @@ public:
     static void display_alive_objects();
     static int count_alive_objects(const QString &className = QString());
 
+    static DebugInfoModel *model;
+
 private:
     DebugInfo() = default;
-    static QList<QObject*> alive_objects;
 };
 
 #endif // DEBUGINFO_H
