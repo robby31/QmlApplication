@@ -32,15 +32,22 @@ QString DebugInfoItem::id() const
 
  bool DebugInfoItem::setData(const QVariant &value, const int &role)
  {
+     QVector<int> roles;
+     roles << Qt::DisplayRole;
+
      if (role == NameRole)
      {
          m_name = value.toString();
+         roles << role;
+         emit itemChanged(roles);
          return true;
      }
 
      if (role == CounterRole)
      {
          m_counter = value.toInt();
+         roles << role;
+         emit itemChanged(roles);
          return true;
      }
 

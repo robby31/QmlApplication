@@ -33,6 +33,10 @@ void DebugInfoModel::_updateItem(const QString &className)
             appendRow(item);
         }
     }
+    else
+    {
+        qCritical() << "unable to update debug item" << className;
+    }
 }
 
 void DebugInfoModel::add_object(QObject *obj)
@@ -101,4 +105,17 @@ QHash<QString, int> DebugInfoModel::count_alive_objects_by_className()
     for (i = h_objects.begin(); i != h_objects.end(); ++i)
         res[i.key()] = i.value().size();
     return res;
+}
+
+QAbstractItemModel *DebugInfoModel::detailsModel(const QString &className)
+{
+    auto model = new QStringListModel(this);
+    QStringList list;
+    if (h_objects.contains(className))
+    {
+        for (QObject *elt : h_objects[className])
+            list << elt->metaObject()->className();
+    }
+    model->setStringList(list);
+    return model;
 }

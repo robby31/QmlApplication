@@ -3,6 +3,7 @@
 
 #include "Models/listmodel.h"
 #include "debuginfoitem.h"
+#include <QStringListModel>
 
 class DebugInfoModel : public ListModel
 {
@@ -21,6 +22,9 @@ public:
 signals:
     void updateAllItemsSignal();
     void updateItemSignal(const QString &className);
+
+public slots:
+    QAbstractItemModel* detailsModel(const QString &className);
 
 private slots:
     void _updateAllItems();
