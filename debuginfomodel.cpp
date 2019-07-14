@@ -114,7 +114,14 @@ QAbstractItemModel *DebugInfoModel::detailsModel(const QString &className)
     if (h_objects.contains(className))
     {
         for (QObject *elt : h_objects[className])
-            list << elt->metaObject()->className();
+        {
+            QString objectString;
+            if (elt->parent())
+                objectString = QString("%1 parent(%2)").arg(elt->metaObject()->className(), elt->parent()->metaObject()->className());
+            else
+                objectString = QString("%1 parent(null)").arg(elt->metaObject()->className());
+            list << objectString;
+        }
     }
     model->setStringList(list);
     return model;

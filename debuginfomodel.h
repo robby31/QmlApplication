@@ -4,6 +4,7 @@
 #include "Models/listmodel.h"
 #include "debuginfoitem.h"
 #include <QStringListModel>
+#include <QDebug>
 
 class DebugInfoModel : public ListModel
 {
