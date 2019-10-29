@@ -220,7 +220,7 @@ void tst_markupdocument::testCase_Html2()
     QCOMPARE(blocks.at(0)->name(), "head");
     QCOMPARE(blocks.at(0)->attributes().size(), 0);
     QCOMPARE(blocks.at(0)->parentBlock(), doc.blocks().at(2));
-    QCOMPARE(blocks.at(0)->blocks().size(), 64);
+    QCOMPARE(blocks.at(0)->blocks().size(), 65);
 
     // check body
     QCOMPARE(blocks.at(1)->type(), TYPE::Element);
@@ -236,4 +236,76 @@ void tst_markupdocument::testCase_Html2()
     QCOMPARE(blocks.at(0)->parentBlock(), doc.blocks().at(2)->blocks().at(1));
     QCOMPARE(blocks.at(0)->toString(), "<div id=\"fb-root\" class=\" fb_reset\">");
     QCOMPARE(blocks.at(0)->blocks().size(), 2);
+}
+
+
+void tst_markupdocument::testCase_Html3()
+{
+    MarkupDocument doc;
+
+    QFile file(":doc3.html");
+    QVERIFY(file.open(QFile::ReadOnly));
+
+    doc.setContent(file.readAll());
+
+    QVERIFY(doc.isValid());
+    QCOMPARE(doc.docType(), DOC_TYPE::HTML);
+
+    MarkupBlock *block = doc.firstBlock();
+    QVERIFY(block != Q_NULLPTR);
+
+    if (block)
+    {
+        QCOMPARE(block->type(), TYPE::DocType);
+        QCOMPARE(block->name(), "!DOCTYPE");
+        QCOMPARE(block->attributes().size(), 0);
+        QCOMPARE(block->toString(), "<!DOCTYPE html>");
+    }
+
+    QList<MarkupBlock*> blocks = doc.blocks();
+    QCOMPARE(blocks.size(), 2);
+    QCOMPARE(blocks.at(0)->type(), TYPE::DocType);
+    QCOMPARE(blocks.at(0)->name(), "!DOCTYPE");
+    QCOMPARE(blocks.at(0)->attributes().size(), 0);
+    QCOMPARE(blocks.at(0)->parentBlock(), Q_NULLPTR);
+    QCOMPARE(blocks.at(0)->blocks().size(), 0);
+
+    // check html
+    blocks = doc.blocks().at(1)->blocks();
+    QCOMPARE(blocks.size(), 3);
+    QCOMPARE(blocks.at(0)->type(), TYPE::Element);
+    QCOMPARE(blocks.at(0)->name(), "head");
+    QCOMPARE(blocks.at(0)->attributes().size(), 0);
+    QCOMPARE(blocks.at(0)->parentBlock(), doc.blocks().at(1));
+    QCOMPARE(blocks.at(0)->blocks().size(), 70);
+
+    // check body
+    QCOMPARE(blocks.at(1)->type(), TYPE::Element);
+    QCOMPARE(blocks.at(1)->name(), "body");
+    QCOMPARE(blocks.at(1)->attributes().size(), 4);
+    QCOMPARE(blocks.at(1)->parentBlock(), doc.blocks().at(1));
+    QCOMPARE(blocks.at(1)->blocks().size(), 17);
+
+    QHash<QString, QVariant> attributes;
+    attributes["class"] = "pl-video-title";
+    QList<MarkupBlock*> results = blocks.at(1)->findBlocks("td", attributes);
+    for (auto tdBlock : results)
+    {
+        QList<MarkupBlock*> results_aBlocks = tdBlock->findBlocks("a");
+        if (results_aBlocks.size() > 1)
+        {
+            if (results_aBlocks.at(0)->attributes().contains("href"))
+            qWarning() << results_aBlocks.at(0)->attributes()["href"];
+        }
+    }
+
+    QCOMPARE(results.size(), 33);
+
+    attributes["class"] = "pl-header-title";
+    results = blocks.at(1)->findBlocks("h1", attributes);
+    for (auto h1Block : results)
+    {
+        if (!h1Block->blocks().empty() && h1Block->blocks().at(0)->type() == TYPE::Data)
+            qWarning() << "TITLE" << h1Block->blocks().at(0)->toString();
+    }
 }

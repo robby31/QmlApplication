@@ -21,7 +21,8 @@ LIBS += -L$$(MYLIBRARY)/$$QT_VERSION -l$$qtLibraryTarget(QmlApplication)
 
 DISTFILES += \
     doc1.html \
-    doc1.xml
+    doc1.xml \
+    doc3.html
 
 RESOURCES += \
     data.qrc

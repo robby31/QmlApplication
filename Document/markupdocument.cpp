@@ -42,9 +42,10 @@ void MarkupDocument::parse_data()
 
     MarkupBlock *parentBlock = Q_NULLPTR;
     MarkupBlock *lastBlock = Q_NULLPTR;
+    QString lastEndBlock;
 
     // parse data
-    QRegularExpression pattern(R"((<(?P<name>!--|[/!?]?[\w:]+)(?P<attributes>\s[^>]*)?>))");
+    QRegularExpression pattern(R"(<(?:([/!?]?[\w:]+)(\s[^>]*)?>|(!--)(.*)-->))");
     if (!pattern.isValid())
         qCritical() << pattern.errorString();
 
@@ -53,7 +54,15 @@ void MarkupDocument::parse_data()
     while (iterator.hasNext())
     {
         QRegularExpressionMatch match = iterator.next();
-        qDebug() << match.capturedStart() << match.capturedEnd() << match.captured("name") << match.captured("attributes") << match.captured(0) << m_data.mid(match.capturedStart(), match.capturedLength());
+        qDebug() << match.capturedStart() << match.capturedEnd() << match.capturedTexts() << m_data.mid(match.capturedStart(), match.capturedLength());
+
+        QString capturedName = match.captured(1);
+        QString capturedAttributes = match.captured(2);
+        if (capturedName.isEmpty() && capturedAttributes.isEmpty())
+        {
+            capturedName = match.captured(3);
+            capturedAttributes = match.captured(4);
+        }
 
         if (capturedIndex != -1 && capturedIndex != match.capturedStart())
         {
@@ -76,18 +85,29 @@ void MarkupDocument::parse_data()
 
         if (!parentBlock)
         {
-            block = appendChild(match.captured("name"), match.captured("attributes"), match.captured(0));
+            block = appendChild(capturedName, capturedAttributes, match.captured(0));
         }
         else
         {
-            block = parentBlock->appendChild(match.captured("name"), match.captured("attributes"), match.captured(0));
+            block = parentBlock->appendChild(capturedName, capturedAttributes, match.captured(0));
 
             if (block && block->name().startsWith("/"))
             {
-                if (parentBlock->name() == block->name().right(block->name().size()-1))
+                while (parentBlock->name() != block->name().right(block->name().size()-1) && parentBlock->name() == lastEndBlock.right(lastEndBlock.size()-1))
+                {
+                    qWarning() << "Assuming block is finished :" << parentBlock->toString();
                     parentBlock = parentBlock->parentBlock();
+                }
+
+                if (parentBlock->name() == block->name().right(block->name().size()-1))
+                {
+                    parentBlock = parentBlock->parentBlock();
+                    lastEndBlock = block->name();
+                }
                 else
-                    qCritical() << "invalid tag" << match.capturedStart() << block->toString() << "parent" << parentBlock->toString();
+                {
+                    qCritical() << "invalid tag" << match.capturedStart() << block->toString() << "parent" << parentBlock->toString() << "last end block" << lastEndBlock;
+                }
             }
         }
 

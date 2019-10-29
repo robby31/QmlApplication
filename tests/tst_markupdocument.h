@@ -15,6 +15,7 @@ public:
     tst_markupdocument() = default;
 
 private Q_SLOTS:
+    void testCase_Html3();
     void testCase_Html2();
     void testCase_Html();
     void testCase_Xml();
