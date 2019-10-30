@@ -103,11 +103,11 @@ HEADERS +=  \
     Document/markupblock.h
 
 #DEFINES += PROFILING
-INCLUDEPATH += $$(MYLIBRARY)/$$QT_VERSION/include/analyzer
-LIBS += -L$$(MYLIBRARY)/$$QT_VERSION -l$$qtLibraryTarget(analyzer)
+INCLUDEPATH += $$(MYLIBRARY)/include/analyzer
+LIBS += -L$$(MYLIBRARY) -l$$qtLibraryTarget(analyzer)
 
-installPath = $$(MYLIBRARY)/$$QT_VERSION
-target.path = $$installPath
+installPath = $$(MYLIBRARY)
+target.path = $$installPath/lib
 INSTALLS += target
 
 installIncludePath = $$installPath/include/QmlApplication

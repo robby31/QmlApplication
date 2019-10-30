@@ -13,11 +13,11 @@ HEADERS += \
     tst_sqlquerymodel.h \
     tst_markupdocument.h
 
-INCLUDEPATH += $$(MYLIBRARY)/$$QT_VERSION/include/analyzer
-LIBS += -L$$(MYLIBRARY)/$$QT_VERSION -l$$qtLibraryTarget(analyzer)
+INCLUDEPATH += $$(MYLIBRARY)/include/analyzer
+LIBS += -L$$(MYLIBRARY)/lib -l$$qtLibraryTarget(analyzer)
 
-INCLUDEPATH += $$(MYLIBRARY)/$$QT_VERSION/include/QmlApplication
-LIBS += -L$$(MYLIBRARY)/$$QT_VERSION -l$$qtLibraryTarget(QmlApplication)
+INCLUDEPATH += $$(MYLIBRARY)/include/QmlApplication
+LIBS += -L$$(MYLIBRARY)/lib -l$$qtLibraryTarget(QmlApplication)
 
 DISTFILES += \
     doc1.html \
