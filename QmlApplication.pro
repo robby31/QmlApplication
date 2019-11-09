@@ -104,7 +104,7 @@ HEADERS +=  \
 
 #DEFINES += PROFILING
 INCLUDEPATH += $$(MYLIBRARY)/include/analyzer
-LIBS += -L$$(MYLIBRARY) -l$$qtLibraryTarget(analyzer)
+LIBS += -L$$(MYLIBRARY)/lib -l$$qtLibraryTarget(analyzer)
 
 installPath = $$(MYLIBRARY)
 target.path = $$installPath/lib
