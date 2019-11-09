@@ -36,10 +36,10 @@ public:
     void appendChild(MarkupBlock *block);
     MarkupBlock *appendChild(const QString &name, const QString &attributes, const QString &str_definition);
     QList<MarkupBlock*> blocks() const;
-    QList<MarkupBlock*> findBlocks(const QString &name,  QHash<QString, QVariant> attributes = QHash<QString, QVariant>());
+    QList<MarkupBlock*> findBlocks(const QString &name,  const QHash<QString, QVariant> &attributes = QHash<QString, QVariant>());
 
     /* Find unique block with tag <name> */
-    MarkupBlock *findBlock(const QString &name,  QHash<QString, QVariant> attributes = QHash<QString, QVariant>());
+    MarkupBlock *findBlock(const QString &name,  const QHash<QString, QVariant> &attributes = QHash<QString, QVariant>());
 
 private:
     QString m_name;

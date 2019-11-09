@@ -63,7 +63,10 @@ void MarkupBlock::appendChild(MarkupBlock *block)
 
     m_blocks.append(block);
     block->setParent(this);
+
+    #if !defined(QT_NO_DEBUG_OUTPUT)
     qDebug() << name() << "APPEND CHILD" << block->name();
+    #endif
 }
 
 MarkupBlock *MarkupBlock::appendChild(const QString &name, const QString &attributes, const QString &str_definition)
@@ -89,7 +92,7 @@ MarkupBlock *MarkupBlock::parentBlock() const
     return qobject_cast<MarkupBlock*>(parent());
 }
 
-QList<MarkupBlock*> MarkupBlock::findBlocks(const QString &name, const QHash<QString, QVariant> attributes)
+QList<MarkupBlock*> MarkupBlock::findBlocks(const QString &name, const QHash<QString, QVariant> &attributes)
 {
     ANALYZER;
 
@@ -124,7 +127,7 @@ QList<MarkupBlock*> MarkupBlock::findBlocks(const QString &name, const QHash<QSt
     return res;
 }
 
-MarkupBlock *MarkupBlock::findBlock(const QString &name, QHash<QString, QVariant> attributes)
+MarkupBlock *MarkupBlock::findBlock(const QString &name, const QHash<QString, QVariant> &attributes)
 {
     ANALYZER;
 
