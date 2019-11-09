@@ -15,15 +15,15 @@ public:
         CheckedRole
     };
 
-    explicit CheckedItem(QObject *parent=0);
+    explicit CheckedItem(QObject *parent=Q_NULLPTR);
 
-    virtual QVariant data(int role) const;
-    virtual bool setData(const QVariant &value, const int &role);
-    QHash<int, QByteArray> roleNames() const;
+    QVariant data(int role) const Q_DECL_OVERRIDE;
+    bool setData(const QVariant &value, const int &role) Q_DECL_OVERRIDE;
+    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
 private:
     QString m_name;
-    bool m_checked;
+    bool m_checked = true;
 };
 
 #endif // CHECKEDITEM_H

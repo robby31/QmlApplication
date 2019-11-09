@@ -2,8 +2,7 @@
 
 CheckedItem::CheckedItem(QObject *parent):
     ListItem(parent),
-    m_name(),
-    m_checked(true)
+    m_name()
 {
 }
 

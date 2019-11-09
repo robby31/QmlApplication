@@ -9,7 +9,7 @@ class MyRunnable : public QObject, public QRunnable
     Q_OBJECT
 
 public:
-    explicit MyRunnable();
+    explicit MyRunnable() = default;
 
     bool isAborted() const { return m_abort; }
 
@@ -19,7 +19,7 @@ private slots:
     void abort();
 
 private:
-    bool m_abort;
+    bool m_abort = false;
 };
 
 #endif // MYRUNNABLE_H

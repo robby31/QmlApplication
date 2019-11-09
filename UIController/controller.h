@@ -52,10 +52,10 @@ public slots:
 
 
 private:
-    UiServices *m_uiServices;
-    int m_progressValue;
+    UiServices *m_uiServices = Q_NULLPTR;
+    int m_progressValue = 0;
     QString m_activity;
-    bool m_busyIndicator;
+    bool m_busyIndicator = false;
 };
 
 #endif // CONTROLLER_H

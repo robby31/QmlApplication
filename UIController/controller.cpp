@@ -2,10 +2,7 @@
 
 Controller::Controller(QObject *parent) :
     QObject(parent),
-    m_uiServices(Q_NULLPTR),
-    m_progressValue(0),
-    m_activity("IDLE"),      // default value when controller is ready
-    m_busyIndicator(false)
+    m_activity("IDLE")      // default value when controller is ready
 {
 }
 

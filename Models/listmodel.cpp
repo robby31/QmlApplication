@@ -3,17 +3,14 @@
 
 ListModel::ListModel(ListItem* prototype, QObject *parent) :
     AbstractListModel(parent),
-    m_prototype(prototype),
-    m_isFiltered(false)
+    m_prototype(prototype)
 {
     qRegisterMetaType<QVector<int> >("QVector<int>");
     connect(this, SIGNAL(filterRoleSignal(QString,QString)), this, SLOT(filterRoleSlot(QString,QString)));
 }
 
 ListModel::ListModel(QObject *parent) :
-    AbstractListModel(parent),
-    m_prototype(),
-    m_isFiltered(false)
+    AbstractListModel(parent)
 {
     qRegisterMetaType<QVector<int> >("QVector<int>");
     connect(this, SIGNAL(filterRoleSignal(QString,QString)), this, SLOT(filterRoleSlot(QString,QString)));
@@ -36,7 +33,7 @@ QHash<int, QByteArray> ListModel::roleNames() const
 
 int ListModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
 
     if (!isFiltered())
         return m_list.size();
@@ -186,7 +183,7 @@ void ListModel::clear()
 
 bool ListModel::removeRow(int row, const QModelIndex &parent)
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
 
     if (isFiltered())
     {
@@ -207,7 +204,7 @@ bool ListModel::removeRow(int row, const QModelIndex &parent)
 
 bool ListModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
 
     if (isFiltered())
     {

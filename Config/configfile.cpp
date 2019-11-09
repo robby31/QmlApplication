@@ -8,14 +8,12 @@ const QString ConfigFile::imageTag = "@checkImagePath@";
 const QString ConfigFile::checkImagePath = "file:///"+QDir::currentPath()+"/CheckConfigs/Images/";
 
 ConfigFile::ConfigFile(QObject *parent) :
-    QFile(parent),
-    flag_read(false)
+    QFile(parent)
 {
 }
 
 ConfigFile::ConfigFile(const QFileInfo &fileinfo, QObject *parent) :
-    QFile(fileinfo.absoluteFilePath(), parent),
-    flag_read(false)
+    QFile(fileinfo.absoluteFilePath(), parent)
 {
 }
 

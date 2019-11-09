@@ -11,7 +11,7 @@ class DatabaseWorker : public Worker
     Q_OBJECT
 
 public:
-    explicit DatabaseWorker(QObject *parent = 0);
+    explicit DatabaseWorker(QObject *parent = Q_NULLPTR);
 
     QString databaseConnectionName() const;
     void setdatabaseConnectionName(const QString &name);

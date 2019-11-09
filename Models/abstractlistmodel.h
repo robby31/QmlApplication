@@ -17,7 +17,7 @@ public:
 
     QModelIndex index(int row, int column,
                       const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE { Q_UNUSED(parent) return createIndex(row, column, quintptr(0)); }
-    QModelIndex parent(const QModelIndex &child) const Q_DECL_OVERRIDE { Q_UNUSED(child); return QModelIndex(); }
+    QModelIndex parent(const QModelIndex &child) const Q_DECL_OVERRIDE { Q_UNUSED(child) return {}; }
 
     Q_INVOKABLE QVariant dataByStringRole(const QModelIndex &index, const QString &role) const;
 

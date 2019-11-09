@@ -12,8 +12,8 @@ class Worker : public QObject
     Q_OBJECT
 
 public:
-    explicit Worker(QObject *parent = 0);
-    virtual ~Worker() {}
+    explicit Worker(QObject *parent = Q_NULLPTR);
+    ~Worker() Q_DECL_OVERRIDE = default;
 
     bool isRunning() const { return m_running; }
 
@@ -25,7 +25,7 @@ signals:
     void progress(const int &progress);
     void errorDuringProcess(const QString &errorMessage);
     void processAborted();
-    void processOver(const QString &message = 0);
+    void processOver(const QString &message = QString());
 
 public slots:
     void abortProcess() { emit processAborted(); }
@@ -35,10 +35,10 @@ private slots:
     void _progress(const int &progress);
     void _errorDuringProcess(const QString &errorMessage);
     void _processAborted();
-    void _processOver(const QString &message = 0);
+    void _processOver(const QString &message = QString());
 
 private:
-    bool m_running;
+    bool m_running = false;
 };
 
 #endif // WORKER_H

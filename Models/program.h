@@ -17,12 +17,12 @@ public:
   };
 
 public:
-    Program(QObject *parent = 0): ListItem(parent) {}
-    explicit Program(const QString &name, QObject *parent = 0);
+    Program(QObject *parent = Q_NULLPTR): ListItem(parent) {}
+    explicit Program(const QString &name, QObject *parent = Q_NULLPTR);
     
-    virtual QVariant data(int role) const;
-    virtual bool setData(const QVariant &value, const int &role);
-    QHash<int, QByteArray> roleNames() const;
+    QVariant data(int role) const Q_DECL_OVERRIDE;
+    bool setData(const QVariant &value, const int &role) Q_DECL_OVERRIDE;
+    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
     QString name()          const {return m_name;}
     QString image()         const {return m_image;}

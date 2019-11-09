@@ -179,7 +179,7 @@ void BaseSqlListModel::resetModel()
 
 void BaseSqlListModel::reload()
 {
-    if (roleNames().size() == 0)
+    if (roleNames().isEmpty())
     {
         resetModel();
         return;

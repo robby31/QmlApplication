@@ -1,10 +1,7 @@
 #include "uiservices.h"
 
 UiServices::UiServices(QObject *parent) :
-    QObject(parent),
-    m_popupVisible(false),
-    m_popupText(""),
-    m_popupType(POP_ERROR)
+    QObject(parent)
 {
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(unPop()));
 }

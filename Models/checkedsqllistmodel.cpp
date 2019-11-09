@@ -1,11 +1,7 @@
 #include "checkedsqllistmodel.h"
 
 CheckedSqlListModel::CheckedSqlListModel(QObject *parent) :
-    BaseSqlListModel(parent),
-    m_parameter(),
-    m_allChecked(true),
-    m_textFilter(),
-    m_queryData()
+    BaseSqlListModel(parent)
 {
     addCustomRole("checked");
     addCustomRole("name");

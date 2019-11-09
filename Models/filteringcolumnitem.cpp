@@ -2,15 +2,13 @@
 
 FilteringColumnItem::FilteringColumnItem(QObject *parent) :
     ListItem(parent),
-    m_name(),
-    m_used(false)
+    m_name()
 {
 }
 
 FilteringColumnItem::FilteringColumnItem(const QString &name, QObject *parent) :
     ListItem(parent),
-    m_name(name),
-    m_used(false)
+    m_name(name)
 {
 }
 

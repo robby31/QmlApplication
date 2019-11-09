@@ -1,8 +1,7 @@
 #include "worker.h"
 
 Worker::Worker(QObject *parent) :
-    QObject(parent),
-    m_running(false)
+    QObject(parent)
 {
     connect(this, SIGNAL(processStarted()),             this, SLOT(_processStarted()));
     connect(this, SIGNAL(progress(int)),                this, SLOT(_progress(int)));

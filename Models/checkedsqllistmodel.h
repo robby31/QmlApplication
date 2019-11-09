@@ -13,7 +13,7 @@ class CheckedSqlListModel : public BaseSqlListModel
     Q_PROPERTY (QString textFilter READ textFilter WRITE setTextFilter NOTIFY textFilterChanged)
 
 public:
-    explicit CheckedSqlListModel(QObject *parent = 0);
+    explicit CheckedSqlListModel(QObject *parent = Q_NULLPTR);
 
     QString parameter() const { return m_parameter; }
     void setParameter(const QString &value);
@@ -21,8 +21,8 @@ public:
     bool allchecked() const { return m_allChecked; }
     void setAllChecked(const bool &flag) { m_allChecked = flag; emit allcheckedChanged(); }
 
-    virtual QVariant data(const QModelIndex &index, int role) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
+    bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
 
     QString queryData() const { return m_queryData; }
     void setQueryData(const QString &query);
@@ -46,7 +46,7 @@ private slots:
 
 private:
     QString m_parameter;
-    bool m_allChecked;
+    bool m_allChecked = true;
     QStringList m_filteredName;
     QString m_textFilter;
     QString m_queryData;

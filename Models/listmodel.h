@@ -58,9 +58,9 @@ private slots:
     void clearFilter();
 
 protected:
-    ListItem* m_prototype;
+    ListItem* m_prototype = Q_NULLPTR;
     QList<ListItem*> m_list;
-    bool m_isFiltered;
+    bool m_isFiltered = false;
     QList<int> m_filteredIndex;
 };
 

@@ -13,10 +13,10 @@ class UiServices : public QObject
     Q_PROPERTY(PopupType popupType READ popupType WRITE setPopupType NOTIFY popupTypeChanged)
 
 public:
-    Q_ENUMS(PopupType)
     enum PopupType {POP_INFO, POP_WARNING, POP_ERROR};
+    Q_ENUM(PopupType)
 
-    explicit UiServices(QObject *parent = 0);
+    explicit UiServices(QObject *parent = Q_NULLPTR);
 
 private:
     bool popupVisible()   const {return m_popupVisible;}
@@ -33,15 +33,15 @@ signals:
     void popupTypeChanged();
 
 public slots:
-    void pop(const QString &message, const PopupType &type = POP_INFO);
+    void pop(const QString &message, const UiServices::PopupType &type = POP_INFO);
     void unPop();
 
 private:
     QTimer m_timer;
 
-    bool m_popupVisible;
+    bool m_popupVisible = false;
     QString m_popupText;
-    PopupType m_popupType;
+    PopupType m_popupType = POP_ERROR;
 };
 
 #endif // UISERVICES_H

@@ -15,8 +15,8 @@ class ConfigFile : public QFile
     Q_OBJECT
 
 public:
-    explicit ConfigFile(QObject *parent = 0);
-    ConfigFile(const QFileInfo &fileinfo, QObject *parent = 0);
+    explicit ConfigFile(QObject *parent = Q_NULLPTR);
+    ConfigFile(const QFileInfo &fileinfo, QObject *parent = Q_NULLPTR);
 
     QList<QString> getKeys();
     QString getData(const QString &param);
@@ -36,7 +36,7 @@ public slots:
 
 private:
     QDateTime last_read;
-    bool flag_read;
+    bool flag_read = false;
     QHash<QString, QString> data;
     QStringList keys;
 

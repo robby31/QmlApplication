@@ -15,12 +15,12 @@ public:
         UsedRole
     };
 
-    explicit FilteringColumnItem(QObject *parent = 0);
-    explicit FilteringColumnItem(const QString &name, QObject *parent = 0);
+    explicit FilteringColumnItem(QObject *parent = Q_NULLPTR);
+    explicit FilteringColumnItem(const QString &name, QObject *parent = Q_NULLPTR);
 
-    virtual QVariant data(int role) const;
-    virtual bool setData(const QVariant &value, const int &role);
-    QHash<int, QByteArray> roleNames() const;
+    QVariant data(int role) const Q_DECL_OVERRIDE;
+    bool setData(const QVariant &value, const int &role) Q_DECL_OVERRIDE;
+    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
 signals:
 
@@ -28,7 +28,7 @@ public slots:
 
 private:
     QString m_name;
-    bool m_used;
+    bool m_used = false;
 };
 
 #endif // FILTERINGCOLUMNITEM_H
