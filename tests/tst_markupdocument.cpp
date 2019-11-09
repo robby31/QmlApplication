@@ -126,7 +126,7 @@ void tst_markupdocument::testCase_Html()
     blocks = blocks.at(0)->findBlocks("a", attributes);
     QCOMPARE(blocks.size(), 20);
     for (auto block : blocks)
-        qWarning() << block->attributes()["href"];
+        qInfo() << block->attributes()["href"];
 }
 
 void tst_markupdocument::testCase_Xml()
@@ -284,7 +284,7 @@ void tst_markupdocument::testCase_Html3()
     QCOMPARE(blocks.at(1)->name(), "body");
     QCOMPARE(blocks.at(1)->attributes().size(), 4);
     QCOMPARE(blocks.at(1)->parentBlock(), doc.blocks().at(1));
-    QCOMPARE(blocks.at(1)->blocks().size(), 17);
+    QCOMPARE(blocks.at(1)->blocks().size(), 13);
 
     QHash<QString, QVariant> attributes;
     attributes["class"] = "pl-video-title";
@@ -295,7 +295,7 @@ void tst_markupdocument::testCase_Html3()
         if (results_aBlocks.size() > 1)
         {
             if (results_aBlocks.at(0)->attributes().contains("href"))
-            qWarning() << results_aBlocks.at(0)->attributes()["href"];
+            qInfo() << results_aBlocks.at(0)->attributes()["href"];
         }
     }
 
@@ -306,6 +306,108 @@ void tst_markupdocument::testCase_Html3()
     for (auto h1Block : results)
     {
         if (!h1Block->blocks().empty() && h1Block->blocks().at(0)->type() == TYPE::Data)
-            qWarning() << "TITLE" << h1Block->blocks().at(0)->toString();
+            qInfo() << "TITLE" << h1Block->blocks().at(0)->toString();
     }
+}
+
+void tst_markupdocument::testCase_Html4()
+{
+    MarkupDocument doc;
+
+    QFile file(":doc4.html");
+    QVERIFY(file.open(QFile::ReadOnly));
+
+    doc.setContent(file.readAll());
+
+    QVERIFY(doc.isValid());
+    QCOMPARE(doc.docType(), DOC_TYPE::HTML);
+
+    MarkupBlock *block = doc.firstBlock();
+    QVERIFY(block != Q_NULLPTR);
+
+    if (block)
+    {
+        QCOMPARE(block->type(), TYPE::DocType);
+        QCOMPARE(block->name(), "!DOCTYPE");
+        QCOMPARE(block->attributes().size(), 0);
+        QCOMPARE(block->toString(), "<!DOCTYPE html>");
+    }
+
+    QList<MarkupBlock*> blocks = doc.blocks();
+    QCOMPARE(blocks.size(), 3);
+    QCOMPARE(blocks.at(0)->type(), TYPE::DocType);
+    QCOMPARE(blocks.at(0)->name(), "!DOCTYPE");
+    QCOMPARE(blocks.at(0)->attributes().size(), 0);
+    QCOMPARE(blocks.at(0)->parentBlock(), Q_NULLPTR);
+    QCOMPARE(blocks.at(0)->blocks().size(), 0);
+
+    // check comment
+    QCOMPARE(blocks.at(1)->type(), TYPE::Comment);
+    QCOMPARE(blocks.at(1)->name(), "!--");
+    QCOMPARE(blocks.at(1)->attributes().size(), 0);
+    QCOMPARE(blocks.at(1)->parentBlock(), Q_NULLPTR);
+    QCOMPARE(blocks.at(1)->blocks().size(), 0);
+
+    // check html
+    blocks = doc.blocks().at(2)->blocks();
+    QCOMPARE(blocks.size(), 4);
+    QCOMPARE(blocks.at(0)->type(), TYPE::Element);
+    QCOMPARE(blocks.at(0)->name(), "head");
+    QCOMPARE(blocks.at(0)->attributes().size(), 0);
+    QCOMPARE(blocks.at(0)->parentBlock(), doc.blocks().at(2));
+    QCOMPARE(blocks.at(0)->blocks().size(), 37);
+
+    QCOMPARE(blocks.at(1)->type(), TYPE::Element);
+    QCOMPARE(blocks.at(1)->name(), "xi:include");
+    QCOMPARE(blocks.at(1)->attributes().size(), 1);
+    QCOMPARE(blocks.at(1)->parentBlock(), doc.blocks().at(2));
+    QCOMPARE(blocks.at(1)->blocks().size(), 0);
+
+    QCOMPARE(blocks.at(2)->type(), TYPE::Element);
+    QCOMPARE(blocks.at(2)->name(), "body");
+    QCOMPARE(blocks.at(2)->attributes().size(), 0);
+    QCOMPARE(blocks.at(2)->parentBlock(), doc.blocks().at(2));
+    QCOMPARE(blocks.at(2)->blocks().size(), 0);
+    qWarning() << blocks.at(2)->toString();
+
+    QCOMPARE(blocks.at(3)->type(), TYPE::Element);
+    QCOMPARE(blocks.at(3)->name(), "/html");
+    QCOMPARE(blocks.at(3)->attributes().size(), 0);
+    QCOMPARE(blocks.at(3)->parentBlock(), doc.blocks().at(2));
+    QCOMPARE(blocks.at(3)->blocks().size(), 0);
+}
+
+void tst_markupdocument::testCase_Html_Paw_Patrol()
+{
+    MarkupDocument doc;
+
+    QFile file(":Vidéos Paw Patrol par type - TF1.htm");
+    QVERIFY(file.open(QFile::ReadOnly));
+
+    doc.setContent(file.readAll());
+
+    QVERIFY(doc.isValid());
+    QCOMPARE(doc.docType(), DOC_TYPE::HTML);
+
+    MarkupBlock *block = doc.firstBlock();
+    QVERIFY(block != Q_NULLPTR);
+
+    if (block)
+    {
+        QCOMPARE(block->type(), TYPE::DocType);
+        QCOMPARE(block->name(), "!doctype");
+        QCOMPARE(block->attributes().size(), 0);
+        QCOMPARE(block->toString(), "<!doctype html>");
+    }
+
+    QList<MarkupBlock*> blocks = doc.blocks();
+    QCOMPARE(blocks.size(), 2);
+    QCOMPARE(blocks.at(0)->type(), TYPE::DocType);
+    QCOMPARE(blocks.at(0)->name(), "!doctype");
+    QCOMPARE(blocks.at(0)->attributes().size(), 0);
+    QCOMPARE(blocks.at(0)->parentBlock(), Q_NULLPTR);
+    QCOMPARE(blocks.at(0)->blocks().size(), 0);
+
+    QList<MarkupBlock*> aBlocks = doc.findBlocks("a");
+    QCOMPARE(aBlocks.size(), 127);
 }
