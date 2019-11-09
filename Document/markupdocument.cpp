@@ -45,7 +45,7 @@ void MarkupDocument::parse_data()
     QString lastEndBlock;
 
     // parse data
-    QRegularExpression pattern(R"(<(?:([/!?]?[\w:]+)(\s[^>]*)?>|(!--)(.*)-->))");
+    QRegularExpression pattern(R"(<(?:([/!?]?[\w:]+)(\s[^>]*)?>|(!--)([^>]*)-->))");
     if (!pattern.isValid())
         qCritical() << pattern.errorString();
 
@@ -54,7 +54,10 @@ void MarkupDocument::parse_data()
     while (iterator.hasNext())
     {
         QRegularExpressionMatch match = iterator.next();
+
+        #if !defined(QT_NO_DEBUG_OUTPUT)
         qDebug() << match.capturedStart() << match.capturedEnd() << match.capturedTexts() << m_data.mid(match.capturedStart(), match.capturedLength());
+        #endif
 
         QString capturedName = match.captured(1);
         QString capturedAttributes = match.captured(2);
@@ -72,7 +75,9 @@ void MarkupDocument::parse_data()
             }
             else
             {
+                #if !defined(QT_NO_DEBUG_OUTPUT)
                 qDebug() << "DATA" << capturedIndex << match.capturedStart()-capturedIndex << m_data.mid(capturedIndex, match.capturedStart()-capturedIndex);
+                #endif
 
                 if (lastBlock)
                     lastBlock->set_data(m_data.mid(capturedIndex, match.capturedStart()-capturedIndex));
