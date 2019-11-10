@@ -158,6 +158,14 @@ QString SqlTableModel::selectStatement() const
 
 bool SqlTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    QSqlIndex primary = primaryKey();
+
+    if (!record().contains(primary.fieldName(0)))
+    {
+        qWarning() << "cannot use setData if primaryKey is not in the select statement.";
+        return false;
+    }
+
 //    qWarning() << rowCount() << this << "setData" << index << value << role;
 
     if (role >= Qt::UserRole && (role - Qt::UserRole) < columnCount())
