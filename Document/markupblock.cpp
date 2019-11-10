@@ -145,10 +145,10 @@ TYPE MarkupBlock::type() const
     if (m_name.toLower() == "!doctype")
         return TYPE::DocType;
 
-    if (m_name.toLower().startsWith("?xml"))
+    if (m_name.startsWith("?xml", Qt::CaseInsensitive))
         return TYPE::DocType;
 
-    if (m_name.toLower().startsWith("!--"))
+    if (m_name.startsWith("!--", Qt::CaseInsensitive))
         return TYPE::Comment;
 
     if (!m_name.isEmpty())

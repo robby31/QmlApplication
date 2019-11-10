@@ -13,7 +13,6 @@ class Worker : public QObject
 
 public:
     explicit Worker(QObject *parent = Q_NULLPTR);
-    ~Worker() Q_DECL_OVERRIDE = default;
 
     bool isRunning() const { return m_running; }
 

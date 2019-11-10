@@ -13,6 +13,10 @@ public:
     explicit ListModel(ListItem* prototype, QObject* parent = Q_NULLPTR);
     explicit ListModel(QObject* parent = Q_NULLPTR);
     ~ListModel() Q_DECL_OVERRIDE;
+    ListModel(ListModel const&) = delete;
+    ListModel& operator =(ListModel const&) = delete;
+    ListModel(ListModel&&) = delete;
+    ListModel& operator=(ListModel&&) = delete;
 
     QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
@@ -57,11 +61,13 @@ private slots:
     void filterRoleSlot(const QString &text, const QString &role);
     void clearFilter();
 
-protected:
+private:
     ListItem* m_prototype = Q_NULLPTR;
-    QList<ListItem*> m_list;
     bool m_isFiltered = false;
     QList<int> m_filteredIndex;
+
+protected:
+    QList<ListItem*> m_list;
 };
 
 #endif // LISTMODEL_H

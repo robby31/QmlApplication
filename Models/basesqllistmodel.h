@@ -19,11 +19,11 @@ class BaseSqlListModel : public AbstractListModel
     Q_PROPERTY (QString orderBy READ orderBy WRITE setOrderBy NOTIFY orderByChanged)
     Q_PROPERTY (QString filteringQuery READ filteringQuery WRITE setFilteringQuery NOTIFY filteringQueryChanged)
 
-    typedef struct {
+    struct T_DATACHANGED {
         QModelIndex topLeft;
         QModelIndex bottomRight;
         QVector<int> roles;
-    } T_DATACHANGED;
+    };
 
 public:
     explicit BaseSqlListModel(QObject *parent = Q_NULLPTR);

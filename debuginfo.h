@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QDebug>
-using namespace std;
 
 #include "debuginfomodel.h"
 
@@ -12,7 +11,10 @@ class DebugInfo
 
 public:
     DebugInfo(DebugInfo const&) = delete;
-    void operator=(DebugInfo const&)  = delete;
+    ~DebugInfo() = delete;
+    DebugInfo& operator =(DebugInfo const&) = delete;
+    DebugInfo(DebugInfo&&) = delete;
+    DebugInfo& operator=(DebugInfo&&) = delete;
 
     static void add_object(QObject *obj);
     static void remove_object(QObject *obj);

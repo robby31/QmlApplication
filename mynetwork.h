@@ -8,7 +8,10 @@ class MyNetwork
 {
 public:
     MyNetwork(MyNetwork const&) = delete;
-    void operator=(MyNetwork const&)  = delete;
+    ~MyNetwork() = delete;
+    MyNetwork& operator =(MyNetwork const&) = delete;
+    MyNetwork(MyNetwork&&) = delete;
+    MyNetwork& operator=(MyNetwork&&) = delete;
 
     static QNetworkAccessManager &manager()
     {
