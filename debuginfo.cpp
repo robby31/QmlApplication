@@ -7,11 +7,6 @@ void DebugInfo::add_object(QObject *obj)
     model->add_object(obj);
 }
 
-void DebugInfo::remove_object(QObject *obj)
-{
-    model->remove_object(obj);
-}
-
 void DebugInfo::display_alive_objects()
 {
     model->display_alive_objects();

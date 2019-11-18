@@ -30,6 +30,7 @@ public slots:
 private slots:
     void _updateAllItems();
     void _updateItem(const QString &className);
+    void _objectDestroyed(QObject *obj);
 
 private:
     QList<QObject*> alive_objects;

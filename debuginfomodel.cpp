@@ -51,6 +51,8 @@ void DebugInfoModel::add_object(QObject *obj)
 
         h_objects[className] << obj;
 
+        connect(obj, &QObject::destroyed, this, &DebugInfoModel::_objectDestroyed);
+
         emit updateItemSignal(className);
     }
     else
@@ -95,7 +97,15 @@ int DebugInfoModel::count_alive_objects(const QString &className)
     if (h_objects.contains(className))
         return h_objects[className].size();
 
-    return 0;
+    if (className.isEmpty())
+    {
+        int res = 0;
+        for (QHash<QString, QList<QObject*>>::iterator i = h_objects.begin(); i != h_objects.end(); ++i)
+            res += i.value().size();
+        return res;
+    }
+
+    return -1;
 }
 
 QHash<QString, int> DebugInfoModel::count_alive_objects_by_className()
@@ -125,4 +135,9 @@ QAbstractItemModel *DebugInfoModel::detailsModel(const QString &className)
     }
     model->setStringList(list);
     return model;
+}
+
+void DebugInfoModel::_objectDestroyed(QObject *object)
+{
+    remove_object(object);
 }

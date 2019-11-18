@@ -17,7 +17,6 @@ public:
     DebugInfo& operator=(DebugInfo&&) = delete;
 
     static void add_object(QObject *obj);
-    static void remove_object(QObject *obj);
 
     static void display_alive_objects();
     static int count_alive_objects(const QString &className = QString());
