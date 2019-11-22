@@ -41,36 +41,29 @@ void DebugInfoModel::_updateItem(const QString &className)
 
 void DebugInfoModel::add_object(QObject *obj)
 {
-    if (!alive_objects.contains(obj))
-    {
-        alive_objects << obj;
+    alive_objects << obj;
 
-        QString className = obj->metaObject()->className();
-        if (!h_objects.contains(className))
-            h_objects[className] = QList<QObject*>();
+    QString className = obj->metaObject()->className();
+    if (!h_objects.contains(className))
+        h_objects[className] = QList<QObject*>();
 
-        h_objects[className] << obj;
+    h_objects[className] << obj;
 
-        connect(obj, &QObject::destroyed, this, &DebugInfoModel::_objectDestroyed);
+    connect(obj, &QObject::destroyed, this, &DebugInfoModel::_objectDestroyed);
 
-        emit updateItemSignal(className);
-    }
-    else
-    {
-        qCritical() << "unable to add" << obj << "already in the list.";
-    }
+    emit updateItemSignal(className);
 }
 
 void DebugInfoModel::remove_object(QObject *obj)
 {
-    alive_objects.removeAll(obj);
+    alive_objects.removeOne(obj);
 
     QHash<QString, QList<QObject*>>::iterator i;
     for (i = h_objects.begin(); i != h_objects.end(); ++i)
     {
         if (i.value().contains(obj))
         {
-            i.value().removeAll(obj);
+            i.value().removeOne(obj);
             emit updateItemSignal(i.key());
         }
     }
