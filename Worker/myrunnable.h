@@ -3,17 +3,16 @@
 
 #include <QObject>
 #include <QRunnable>
+#include "debuginfo.h"
 
 class MyRunnable : public QObject, public QRunnable
 {
     Q_OBJECT
 
 public:
-    explicit MyRunnable() = default;
+    explicit MyRunnable(QObject *parent = Q_NULLPTR);
 
     bool isAborted() const { return m_abort; }
-
-signals:
 
 private slots:
     void abort();

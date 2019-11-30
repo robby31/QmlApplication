@@ -37,6 +37,9 @@ public:
 private:
     void parse_data();
 
+private slots:
+    void blockDestroyed(QObject *block);
+
 private:
     QString m_data;
     QList<MarkupBlock*> m_blocks;

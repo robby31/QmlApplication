@@ -5,6 +5,7 @@
 #include <QString>
 #include <QRegularExpression>
 #include "analyzer.h"
+#include "debuginfo.h"
 
 enum class TYPE { DocType, Comment, Element, Data };
 
@@ -40,6 +41,9 @@ public:
 
     /* Find unique block with tag <name> */
     MarkupBlock *findBlock(const QString &name,  const QHash<QString, QVariant> &attributes = QHash<QString, QVariant>());
+
+private slots:
+    void blockDestroyed(QObject *block);
 
 private:
     QString m_name;

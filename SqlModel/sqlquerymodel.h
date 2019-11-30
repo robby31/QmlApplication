@@ -4,6 +4,7 @@
 #include <QtDebug>
 #include <QtSql>
 #include "mysqldatabase.h"
+#include "debuginfo.h"
 
 #include <QDateTime>
 

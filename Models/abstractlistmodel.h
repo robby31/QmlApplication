@@ -40,9 +40,6 @@ signals:
     void rowCountChanged();
     void columnCountChanged();
     void isFilteredChanged();
-
-private slots:
-
 };
 
 #endif // ABSTRACTLISTMODEL_H

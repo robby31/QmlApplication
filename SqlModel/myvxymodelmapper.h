@@ -3,6 +3,7 @@
 
 #include <QtCharts>
 #include <QAbstractItemModel>
+#include "debuginfo.h"
 
 using namespace QtCharts;
 

@@ -9,14 +9,12 @@ class ListModel : public AbstractListModel
 {
     Q_OBJECT
 
+    Q_DISABLE_COPY_MOVE(ListModel)
+
 public:
-    explicit ListModel(ListItem* prototype, QObject* parent = Q_NULLPTR);
-    explicit ListModel(QObject* parent = Q_NULLPTR);
+    explicit ListModel(ListItem *prototype, QObject *parent = Q_NULLPTR);
+    explicit ListModel(QObject *parent = Q_NULLPTR);
     ~ListModel() Q_DECL_OVERRIDE;
-    ListModel(ListModel const&) = delete;
-    ListModel& operator =(ListModel const&) = delete;
-    ListModel(ListModel&&) = delete;
-    ListModel& operator=(ListModel&&) = delete;
 
     QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
@@ -29,17 +27,17 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
 
-    Q_INVOKABLE ListItem* find(const QString &id) const;
+    Q_INVOKABLE ListItem *find(const QString &id) const;
     Q_INVOKABLE int findRow(const QString &id) const;
 
-    QModelIndex indexFromItem(const ListItem* item) const;
+    QModelIndex indexFromItem(const ListItem *item) const;
 
     Q_INVOKABLE void clear();
 
     ListItem *takeRow(int row);
-    void appendRow(ListItem* item) { appendRows(QList<ListItem*>() << item); }
+    void appendRow(ListItem *item) { appendRows(QList<ListItem*>() << item); }
     void appendRows(const QList<ListItem*> &items);
-    void insertRow(int row, ListItem* item);
+    void insertRow(int row, ListItem *item);
     Q_INVOKABLE bool removeRow(int row, const QModelIndex &parent = QModelIndex());
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) Q_DECL_OVERRIDE;
 
@@ -55,14 +53,15 @@ signals:
     void filterRoleSignal(const QString &text, const QString &role);
 
 private slots:
+    void itemDestroyed(QObject *item);
     void itemDataChanged(QVector<int> roles);
 
-    void setFilter(const QList<int>& l_index) { beginResetModel(); m_filteredIndex = l_index; setFlagFiltered(true);  endResetModel(); }
+    void setFilter(const QList<int> &l_index) { beginResetModel(); m_filteredIndex = l_index; setFlagFiltered(true);  endResetModel(); }
     void filterRoleSlot(const QString &text, const QString &role);
     void clearFilter();
 
 private:
-    ListItem* m_prototype = Q_NULLPTR;
+    ListItem *m_prototype = Q_NULLPTR;
     bool m_isFiltered = false;
     QList<int> m_filteredIndex;
 

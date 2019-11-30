@@ -2,9 +2,12 @@
 
 Application::Application(int &argc, char **argv) :
     QApplication(argc, argv),
+    backend(this),
     qmlEngine(this),
     uiServices(this)
 {
+    DebugInfo::add_object(this);
+
 #if defined(WEBENGINE_PACKAGE)
     QtWebEngine::initialize();
 #endif
@@ -37,6 +40,11 @@ Application::Application(int &argc, char **argv) :
     connect(this, SIGNAL(createDatabaseSignal(QString,QString)), worker, SLOT(createDatabase(QString,QString)));
     connect(this, SIGNAL(databaseOptionsSignal(QString)), worker, SLOT(databaseOptions(QString)));
     connect(this, SIGNAL(databaseOpened(QString)), worker, SLOT(databaseOpened(QString)));
+}
+
+QThread *Application::backendThread()
+{
+    return &backend;
 }
 
 void Application::setMainWindowTitle(const QString &name)

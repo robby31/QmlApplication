@@ -6,6 +6,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QThread>
+#include "debuginfo.h"
 
 #if defined(WEBENGINE_PACKAGE)
 #include <QtWebView>
@@ -32,7 +33,7 @@ class Application : public QApplication
 public:
     explicit Application(int &argc, char **argv);
 
-    QThread *backendThread() { return &backend; }
+    QThread *backendThread();
 
     void addToBackend(QObject *obj);
     void addWorker(Controller *controller, Worker *worker);

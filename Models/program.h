@@ -31,10 +31,6 @@ public:
     void setName(const QString &name)               {m_name = name;}
     void setImage(const QString &image)             {m_image = image;}
     void setDescription(const QString &description) {m_description = description;}
-
-signals:
-    
-public slots:
     
 private:
     QString m_name;

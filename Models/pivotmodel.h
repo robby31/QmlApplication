@@ -18,8 +18,6 @@ public:
 signals:
     void totalChanged();
 
-public slots:
-
 private:
     QString m_totalParam;
 };

@@ -133,24 +133,17 @@ void ListModel::insertItem(ListItem *item, int row)
                 m_list.insert(row, item);
             else
                 m_list.append(item);
+            connect(item, &ListItem::destroyed, this, &ListModel::itemDestroyed);
             connect(item, SIGNAL(itemChanged(QVector<int>)), this, SLOT(itemDataChanged(QVector<int>)));
         }
         else
         {
-            if (row>=0)
-                m_list.insert(row, Q_NULLPTR);
-            else
-                m_list.append(Q_NULLPTR);
-            qWarning() << "cannot append" << item << "in the model" << this << "(null item added)";
+            qCritical() << "cannot append" << item << "in the model" << this;
         }
     }
     else
     {
-        qWarning() << "cannot add null item";
-        if (row>=0)
-            m_list.insert(row, Q_NULLPTR);
-        else
-            m_list.append(Q_NULLPTR);
+        qCritical() << "cannot add null item";
     }
 }
 
@@ -305,5 +298,38 @@ void ListModel::filterRoleSlot(const QString &text, const QString &role)
     else
     {
         qWarning() << "ERROR invalid role" << role << "to filter" << this;
+    }
+}
+
+void ListModel::itemDestroyed(QObject *item)
+{
+    QList<ListItem*>::Iterator it = m_list.begin();
+    int index = 0;
+    while (it != m_list.end())
+    {
+        if (*it == item)
+        {
+            if (!isFiltered())
+            {
+                beginRemoveRows(QModelIndex(), index, index);
+                it = m_list.erase(it);
+                endRemoveRows();
+            }
+            else if (m_filteredIndex.contains(index))
+            {
+                beginRemoveRows(QModelIndex(), m_filteredIndex[index], m_filteredIndex[index]);
+                it = m_list.erase(it);
+                endRemoveRows();
+            }
+            else
+            {
+                it = m_list.erase(it);
+            }
+        }
+        else
+        {
+            it++;
+        }
+        index++;
     }
 }

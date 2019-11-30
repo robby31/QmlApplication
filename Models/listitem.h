@@ -2,14 +2,13 @@
 #define LISTITEM_H
 
 #include <QObject>
-#include <QVector>
 
 class ListItem : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ListItem(QObject* parent = Q_NULLPTR);
+    explicit ListItem(QObject *parent = Q_NULLPTR);
 
     virtual QString id() const { return QString("%1").arg(quintptr(this)); }
 

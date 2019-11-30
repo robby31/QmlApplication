@@ -4,6 +4,7 @@ MarkupBlock::MarkupBlock(QObject *parent):
     QObject(parent)
 {
     ANALYZER;
+    DebugInfo::add_object(this);
 }
 
 MarkupBlock::MarkupBlock(const QString &name, const QString &attributes, const QString &str_definition, QObject *parent):
@@ -12,6 +13,8 @@ MarkupBlock::MarkupBlock(const QString &name, const QString &attributes, const Q
     m_definition(str_definition)
 {
     ANALYZER;
+
+    DebugInfo::add_object(this);
 
     // parse attributes
     QRegularExpression pattern(R"((?P<param>[^=]+)\s*=\s*["'](?P<value>[^"']+)["']?)");
@@ -28,7 +31,7 @@ MarkupBlock::MarkupBlock(const QString &data, QObject *parent):
     m_definition(data)
 {
     ANALYZER;
-
+    DebugInfo::add_object(this);
 }
 
 bool MarkupBlock::isValid() const
@@ -63,6 +66,7 @@ void MarkupBlock::appendChild(MarkupBlock *block)
 
     m_blocks.append(block);
     block->setParent(this);
+    connect(block, &MarkupBlock::destroyed, this, &MarkupBlock::blockDestroyed);
 
     #if !defined(QT_NO_DEBUG_OUTPUT)
     qDebug() << name() << "APPEND CHILD" << block->name();
@@ -73,7 +77,7 @@ MarkupBlock *MarkupBlock::appendChild(const QString &name, const QString &attrib
 {
     ANALYZER;
 
-    auto block = new MarkupBlock(name, attributes, str_definition);
+    auto block = new MarkupBlock(name, attributes, str_definition, this);
     appendChild(block);
     return block;
 }
@@ -121,7 +125,7 @@ QList<MarkupBlock*> MarkupBlock::findBlocks(const QString &name, const QHash<QSt
             res << this;
     }
 
-    for (auto child : blocks())
+    for (auto child : m_blocks)
         res << child->findBlocks(name, attributes);
 
     return res;
@@ -179,5 +183,17 @@ void MarkupBlock::set_data(const QString &data)
     {
         auto block = new MarkupBlock(data.trimmed());
         appendChild(block);
+    }
+}
+
+void MarkupBlock::blockDestroyed(QObject *block)
+{
+    QList<MarkupBlock*>::Iterator it = m_blocks.begin();
+    while (it != m_blocks.end())
+    {
+        if (*it == block)
+            it = m_blocks.erase(it);
+        else
+            it++;
     }
 }

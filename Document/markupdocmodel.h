@@ -8,6 +8,7 @@
 #include <QNetworkReply>
 
 #include "Document/markupdocument.h"
+#include "debuginfo.h"
 
 class MarkupDocModel : public QAbstractItemModel
 {

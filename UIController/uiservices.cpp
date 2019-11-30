@@ -3,6 +3,8 @@
 UiServices::UiServices(QObject *parent) :
     QObject(parent)
 {
+    DebugInfo::add_object(this);
+
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(unPop()));
 }
 

@@ -3,6 +3,8 @@
 MyVXYModelMapper::MyVXYModelMapper(QObject *parent):
     QVXYModelMapper(parent)
 {
+    DebugInfo::add_object(this);
+
     connect(this, &MyVXYModelMapper::modelReplaced, this, &MyVXYModelMapper::_modelReplaced);
     connect(this, &MyVXYModelMapper::xColumnChanged, this, &MyVXYModelMapper::_xColumnChanged);
     connect(this, &MyVXYModelMapper::yColumnChanged, this, &MyVXYModelMapper::_yColumnChanged);

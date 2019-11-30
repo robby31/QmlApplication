@@ -3,6 +3,7 @@
 MarkupDocModel::MarkupDocModel(QObject *parent):
     QAbstractItemModel(parent)
 {
+    DebugInfo::add_object(this);
     connect(this, &MarkupDocModel::urlChanged, this, &MarkupDocModel::loadUrl);
 }
 

@@ -15,7 +15,7 @@ public:
         CheckedRole
     };
 
-    explicit CheckedItem(QObject *parent=Q_NULLPTR);
+    explicit CheckedItem(QObject *parent = Q_NULLPTR);
 
     QVariant data(int role) const Q_DECL_OVERRIDE;
     bool setData(const QVariant &value, const int &role) Q_DECL_OVERRIDE;

@@ -22,10 +22,6 @@ public:
     bool setData(const QVariant &value, const int &role) Q_DECL_OVERRIDE;
     QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
-signals:
-
-public slots:
-
 private:
     QString m_name;
     bool m_used = false;

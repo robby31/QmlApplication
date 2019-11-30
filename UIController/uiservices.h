@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include "debuginfo.h"
 
 class UiServices : public QObject
 {

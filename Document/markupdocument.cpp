@@ -5,6 +5,8 @@ MarkupDocument::MarkupDocument(QObject *parent):
 {
     ANALYZER;
 
+    DebugInfo::add_object(this);
+
     QStringList singletonTag;
     singletonTag << "area" << "base" << "br" << "col" << "command" << "embed" << "hr" << "img" << "input" << "keygen" << "link" << "meta" << "param" << "source" << "track" << "wbr";
     setSingletonTag(singletonTag);
@@ -135,6 +137,7 @@ MarkupBlock *MarkupDocument::appendChild(const QString &name, const QString &att
     ANALYZER;
 
     auto block = new MarkupBlock(name, attributes, str_definition);
+    connect(block, &MarkupBlock::destroyed, this, &MarkupDocument::blockDestroyed);
     block->setParent(this);
     m_blocks.append(block);
     return block;
@@ -149,6 +152,7 @@ MarkupBlock *MarkupDocument::appendChild(const QString &data)
     if (!data.trimmed().isEmpty())
     {
         block = new MarkupBlock(data.trimmed());
+        connect(block, &MarkupBlock::destroyed, this, &MarkupDocument::blockDestroyed);
         block->setParent(this);
         m_blocks.append(block);
     }
@@ -210,4 +214,16 @@ QString MarkupDocument::toString() const
 void MarkupDocument::setSingletonTag(const QStringList &tagList)
 {
     m_singletonTag = tagList;
+}
+
+void MarkupDocument::blockDestroyed(QObject *block)
+{
+    QList<MarkupBlock*>::Iterator it = m_blocks.begin();
+    while (it != m_blocks.end())
+    {
+        if (*it == block)
+            it = m_blocks.erase(it);
+        else
+            it++;
+    }
 }

@@ -3,6 +3,8 @@
 SqlQueryModel::SqlQueryModel(QObject *parent):
     QSqlQueryModel(parent)
 {
+    DebugInfo::add_object(this);
+
     connect(this, &SqlQueryModel::connectionNameChanged, this, &SqlQueryModel::_updateCurrentQuery);
 
     connect(this, &SqlQueryModel::modelReset, this, &SqlQueryModel::rowCountChanged);

@@ -3,6 +3,8 @@
 Worker::Worker(QObject *parent) :
     QObject(parent)
 {
+    DebugInfo::add_object(this);
+
     connect(this, SIGNAL(processStarted()),             this, SLOT(_processStarted()));
     connect(this, SIGNAL(progress(int)),                this, SLOT(_progress(int)));
     connect(this, SIGNAL(errorDuringProcess(QString)),  this, SLOT(_errorDuringProcess(QString)));

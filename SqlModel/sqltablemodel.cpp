@@ -3,6 +3,8 @@
 SqlTableModel::SqlTableModel(QObject *parent):
     QSqlTableModel(parent)
 {
+    DebugInfo::add_object(this);
+
     connect(this, &SqlTableModel::modelReset, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsInserted, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsRemoved, this, &SqlTableModel::rowCountChanged);
@@ -15,6 +17,8 @@ SqlTableModel::SqlTableModel(QObject *parent):
 SqlTableModel::SqlTableModel(const QString &connectionName, QObject *parent):
     QSqlTableModel(parent, GET_DATABASE(connectionName))
 {
+    DebugInfo::add_object(this);
+
     connect(this, &SqlTableModel::modelReset, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsInserted, this, &SqlTableModel::rowCountChanged);
     connect(this, &SqlTableModel::rowsRemoved, this, &SqlTableModel::rowCountChanged);

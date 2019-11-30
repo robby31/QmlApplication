@@ -4,6 +4,7 @@
 #include <QtDebug>
 #include <QtSql>
 #include "mysqldatabase.h"
+#include "debuginfo.h"
 
 class SqlTableModel : public QSqlTableModel
 {

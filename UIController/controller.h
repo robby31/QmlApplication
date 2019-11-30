@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include "uiservices.h"
-
+#include "debuginfo.h"
 
 class Controller : public QObject
 {
@@ -17,23 +17,23 @@ class Controller : public QObject
 public:
     explicit Controller(QObject *parent = Q_NULLPTR);
 
-    Q_INVOKABLE void abortProcess() {emit abort();}
+    Q_INVOKABLE void abortProcess();
 
-    void setUiServices(UiServices *uiServices) { m_uiServices = uiServices; }
+    void setUiServices(UiServices *uiServices);
 
     bool setActivity(const QString &activity);
 
-    bool busy()                     const {return m_busyIndicator;}
-    int activityProgress()          const {return m_progressValue;}
-    QString activity()              const {return m_activity;}
+    bool busy()                     const;
+    int activityProgress()          const;
+    QString activity()              const;
 
-    void popMessage(const QString &message, const UiServices::PopupType &type = UiServices::POP_INFO) { if (m_uiServices) m_uiServices->pop(message, type); }
+    void popMessage(const QString &message, const UiServices::PopupType &type = UiServices::POP_INFO);
 
 
 private:
-    bool setActivityIdle() { return setActivity("IDLE"); }
-    void setActivityProgress(const int &progress) {m_progressValue = progress; emit activityProgressChanged();}
-    void setBusy(const bool &flag = true) { m_busyIndicator = flag; emit busyChanged(); }
+    bool setActivityIdle();
+    void setActivityProgress(const int &progress);
+    void setBusy(const bool &flag = true);
 
 
 signals:
@@ -44,12 +44,14 @@ signals:
 
 
 public slots:
-    void processStarted(const QString &activity)                {setActivity(activity);}
-    void activityProgressReceived(const int &progress)          {setActivityProgress(progress); if (!m_busyIndicator) setBusy();}
+    void processStarted(const QString &activity);
+    void activityProgressReceived(const int &progress);
     void processAborted();
-    void errorDuringProcess(const QString &errorMessage)        {popMessage("ERROR: "+errorMessage, UiServices::POP_ERROR);                  setActivityIdle();}
+    void errorDuringProcess(const QString &errorMessage);
     void processOver(const QString &message = QString());
 
+private slots:
+    void uiServicesDestroyed(QObject *obj);
 
 private:
     UiServices *m_uiServices = Q_NULLPTR;

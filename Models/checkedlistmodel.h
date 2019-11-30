@@ -14,11 +14,6 @@ public:
     bool allChecked();
 
     CheckedItem *findByRole(const QVariant &value, const int &role);
-
-signals:
-
-public slots:
-
 };
 
 #endif // CHECKEDLISTMODEL_H

@@ -6,6 +6,7 @@
 #include <QCoreApplication>
 #include <QMutex>
 #include <QWaitCondition>
+#include "debuginfo.h"
 
 class Worker : public QObject
 {
