@@ -41,23 +41,21 @@ void DebugInfoModel::_updateItem(const QString &className)
 
 void DebugInfoModel::add_object(QObject *obj)
 {
-    alive_objects << obj;
-
+#if !defined(QT_NO_DEBUG_OUTPUT)
     QString className = obj->metaObject()->className();
     if (!h_objects.contains(className))
         h_objects[className] = QList<QObject*>();
 
     h_objects[className] << obj;
 
-    connect(obj, &QObject::destroyed, this, &DebugInfoModel::_objectDestroyed);
+    connect(obj, &QObject::destroyed, this, &DebugInfoModel::remove_object);
 
     emit updateItemSignal(className);
+#endif
 }
 
 void DebugInfoModel::remove_object(QObject *obj)
 {
-    alive_objects.removeOne(obj);
-
     QHash<QString, QList<QObject*>>::iterator i;
     for (i = h_objects.begin(); i != h_objects.end(); ++i)
     {
@@ -65,21 +63,22 @@ void DebugInfoModel::remove_object(QObject *obj)
         {
             i.value().removeOne(obj);
             emit updateItemSignal(i.key());
+            break;
         }
     }
 }
 
 void DebugInfoModel::display_alive_objects()
 {
-    if (alive_objects.isEmpty())
+    if (count_alive_objects() == 0)
     {
         qInfo() << "NO ALIVE OBJECTS.";
     }
     else
     {
         qInfo() << "ALIVE OBJECTS:";
-        for (auto elt : alive_objects)
-            qInfo() << "   " << elt;
+        for (auto it = h_objects.constBegin(); it != h_objects.constEnd(); ++it)
+            qInfo() << "   " << it.key() << ":" << it.value().size();
     }
 
     qInfo() << "";
@@ -128,9 +127,4 @@ QAbstractItemModel *DebugInfoModel::detailsModel(const QString &className)
     }
     model->setStringList(list);
     return model;
-}
-
-void DebugInfoModel::_objectDestroyed(QObject *object)
-{
-    remove_object(object);
 }

@@ -14,7 +14,6 @@ public:
     explicit DebugInfoModel(QObject *parent = Q_NULLPTR);
 
     void add_object(QObject *obj);
-    void remove_object(QObject *obj);
 
     void display_alive_objects();
     int count_alive_objects(const QString &className = QString());
@@ -30,10 +29,9 @@ public slots:
 private slots:
     void _updateAllItems();
     void _updateItem(const QString &className);
-    void _objectDestroyed(QObject *obj);
+    void remove_object(QObject *obj);
 
 private:
-    QList<QObject*> alive_objects;
     QHash<QString, QList<QObject*> > h_objects;
 };
 
