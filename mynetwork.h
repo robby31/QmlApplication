@@ -17,7 +17,7 @@ public:
     {
         static QHash<QString, QNetworkAccessManager*> thread_manager;
 
-        QString current_thread_pointer = QString().sprintf("%8p", static_cast<void*>(QThread::currentThread()));
+        QString current_thread_pointer = QString::asprintf("%8p", static_cast<void*>(QThread::currentThread()));
 
         if (thread_manager.contains(current_thread_pointer))
             return *thread_manager[current_thread_pointer];
